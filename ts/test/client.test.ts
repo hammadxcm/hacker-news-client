@@ -1,12 +1,7 @@
-import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { after, before, test } from 'node:test';
 import { startServer } from '../../test/mock-server.js';
-import {
-  HackerNewsClient,
-  HttpError,
-  TimeoutError,
-  type Item,
-} from '../src/index.ts';
+import { HackerNewsClient, HttpError, type Item, TimeoutError } from '../src/index.ts';
 
 let srv: { port: number; close: () => Promise<void> };
 let client: HackerNewsClient;
@@ -91,8 +86,14 @@ test('commentTree(8000) with 8004 pruned', async () => {
   assert.ok(root);
   assert.equal(root.replies.length, 2);
   const [c1, c2] = root.replies;
-  assert.deepEqual(c1?.replies.map((r) => r.id), [8003]);
-  assert.deepEqual(c2?.replies.map((r) => r.id), [8005]);
+  assert.deepEqual(
+    c1?.replies.map((r) => r.id),
+    [8003],
+  );
+  assert.deepEqual(
+    c2?.replies.map((r) => r.id),
+    [8005],
+  );
 });
 
 test('HTTP 500 propagates', async () => {

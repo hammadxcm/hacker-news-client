@@ -1,5 +1,5 @@
-import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import { after, before, test } from 'node:test';
 import { startServer } from '../../test/mock-server.js';
 import { HackerNewsClient, HttpError, TimeoutError } from '../src/index.js';
 

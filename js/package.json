@@ -20,6 +20,12 @@
     "src/",
     "README.md"
   ],
-  "keywords": ["hacker-news", "hackernews", "hn", "api", "client"],
+  "keywords": [
+    "hacker-news",
+    "hackernews",
+    "hn",
+    "api",
+    "client"
+  ],
   "license": "MIT"
 }

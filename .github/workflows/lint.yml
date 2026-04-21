@@ -55,11 +55,8 @@ jobs:
       - name: Install ruff
         run: pip install ruff
 
-      - name: ESLint (JavaScript)
-        run: npm run lint:js
-
-      - name: ESLint + typescript-eslint (TypeScript)
-        run: npm run lint:ts
+      - name: Biome (JavaScript + TypeScript)
+        run: npm run ci:biome
 
       - name: ruff (Python)
         run: npm run lint:py

@@ -23,6 +23,13 @@
     "dist/",
     "README.md"
   ],
-  "keywords": ["hacker-news", "hackernews", "hn", "api", "client", "typescript"],
+  "keywords": [
+    "hacker-news",
+    "hackernews",
+    "hn",
+    "api",
+    "client",
+    "typescript"
+  ],
   "license": "MIT"
 }

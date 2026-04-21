@@ -96,7 +96,7 @@ This package is developed directly from `.ts` sources using Node 22.6+'s
 cd ts
 npm test             # 33 tests: 15 integration + 18 unit
 npm run build        # tsc → dist/
-npm run lint         # ESLint + typescript-eslint
+npm run lint         # Biome (lint + format + import sort)
 ```
 
 Coverage: 100% statements, branches, functions, and lines — measured via `c8`.

@@ -3,8 +3,9 @@
  * tests exercise the client's decode / error-mapping / concurrency logic in
  * isolation.
  */
-import { test } from 'node:test';
+
 import assert from 'node:assert/strict';
+import { test } from 'node:test';
 import {
   HackerNewsClient,
   HackerNewsError,

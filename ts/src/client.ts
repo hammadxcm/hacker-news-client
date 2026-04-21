@@ -1,15 +1,10 @@
-import type { Item, User, Updates, CommentTreeNode } from "./types.ts";
-import {
-  HttpError,
-  JsonError,
-  TimeoutError,
-  TransportError,
-} from "./errors.ts";
+import { HttpError, JsonError, TimeoutError, TransportError } from './errors.ts';
+import type { CommentTreeNode, Item, Updates, User } from './types.ts';
 
-const DEFAULT_BASE_URL = "https://hacker-news.firebaseio.com/v0";
+const DEFAULT_BASE_URL = 'https://hacker-news.firebaseio.com/v0';
 const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_CONCURRENCY = 10;
-const DEFAULT_USER_AGENT = "hn-client-ts/0.1.0";
+const DEFAULT_USER_AGENT = 'hn-client-ts/0.1.0';
 const DEFAULT_STORIES_LIMIT = 30;
 
 export interface HackerNewsClientOptions {
@@ -45,11 +40,7 @@ export class HackerNewsClient {
   private readonly _fetch: typeof fetch;
 
   constructor(opts: HackerNewsClientOptions = {}) {
-    this.baseUrl = (
-      opts.baseUrl ??
-      process.env.HN_BASE ??
-      DEFAULT_BASE_URL
-    ).replace(/\/+$/, "");
+    this.baseUrl = (opts.baseUrl ?? process.env.HN_BASE ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
     this.timeout = opts.timeout ?? DEFAULT_TIMEOUT_MS;
     this.concurrency = opts.concurrency ?? DEFAULT_CONCURRENCY;
     this.userAgent = opts.userAgent ?? DEFAULT_USER_AGENT;
@@ -59,21 +50,18 @@ export class HackerNewsClient {
   private async get(path: string): Promise<unknown> {
     const url = `${this.baseUrl}${path}`;
     const ctrl = new AbortController();
-    const timer = setTimeout(
-      () => ctrl.abort(new TimeoutError({ url })),
-      this.timeout,
-    );
+    const timer = setTimeout(() => ctrl.abort(new TimeoutError({ url })), this.timeout);
     try {
       let res: Response;
       try {
         res = await this._fetch(url, {
           signal: ctrl.signal,
-          headers: { "User-Agent": this.userAgent },
-          redirect: "follow",
+          headers: { 'User-Agent': this.userAgent },
+          redirect: 'follow',
         });
       } catch (err) {
         if (err instanceof TimeoutError) throw err;
-        if ((err as { name?: string }).name === "AbortError") {
+        if ((err as { name?: string }).name === 'AbortError') {
           const reason = ctrl.signal.reason;
           if (reason instanceof TimeoutError) throw reason;
           throw reason ?? err;
@@ -96,9 +84,7 @@ export class HackerNewsClient {
    * @example const item = await client.item(1);
    */
   async item(id: IdLike): Promise<Item | null> {
-    const body = (await this.get(`/item/${id}.json`)) as
-      | (Item & { deleted?: boolean })
-      | null;
+    const body = (await this.get(`/item/${id}.json`)) as (Item & { deleted?: boolean }) | null;
     if (body === null) return null;
     if (body.deleted === true) return null;
     return body as Item;
@@ -141,36 +127,33 @@ export class HackerNewsClient {
   }
 
   async maxItem(): Promise<number> {
-    return (await this.get("/maxitem.json")) as number;
+    return (await this.get('/maxitem.json')) as number;
   }
 
   async updates(): Promise<Updates> {
-    return (await this.get("/updates.json")) as Updates;
+    return (await this.get('/updates.json')) as Updates;
   }
 
   async topStoryIds(): Promise<number[]> {
-    return (await this.get("/topstories.json")) as number[];
+    return (await this.get('/topstories.json')) as number[];
   }
   async newStoryIds(): Promise<number[]> {
-    return (await this.get("/newstories.json")) as number[];
+    return (await this.get('/newstories.json')) as number[];
   }
   async bestStoryIds(): Promise<number[]> {
-    return (await this.get("/beststories.json")) as number[];
+    return (await this.get('/beststories.json')) as number[];
   }
   async askStoryIds(): Promise<number[]> {
-    return (await this.get("/askstories.json")) as number[];
+    return (await this.get('/askstories.json')) as number[];
   }
   async showStoryIds(): Promise<number[]> {
-    return (await this.get("/showstories.json")) as number[];
+    return (await this.get('/showstories.json')) as number[];
   }
   async jobStoryIds(): Promise<number[]> {
-    return (await this.get("/jobstories.json")) as number[];
+    return (await this.get('/jobstories.json')) as number[];
   }
 
-  private async hydrate(
-    fetcher: () => Promise<number[]>,
-    limit: number,
-  ): Promise<Item[]> {
+  private async hydrate(fetcher: () => Promise<number[]>, limit: number): Promise<Item[]> {
     const ids = (await fetcher()).slice(0, limit);
     return this.items(ids);
   }
@@ -219,15 +202,12 @@ export class HackerNewsClient {
       await acquire();
       let node: (Comment & { deleted?: boolean }) | null;
       try {
-        node = (await this.get(`/item/${nodeId}.json`)) as
-          | (Comment & { deleted?: boolean })
-          | null;
+        node = (await this.get(`/item/${nodeId}.json`)) as (Comment & { deleted?: boolean }) | null;
       } finally {
         release();
       }
       if (node === null || node.deleted === true) return null;
-      const childIds =
-        (node as unknown as { kids?: readonly number[] }).kids ?? [];
+      const childIds = (node as unknown as { kids?: readonly number[] }).kids ?? [];
       const children = await Promise.all(childIds.map((cid) => visit(cid)));
       return {
         ...(node as Comment),

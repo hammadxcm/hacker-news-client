@@ -8,8 +8,8 @@
 export { HackerNewsClient } from './client.js';
 export {
   HackerNewsError,
-  TimeoutError,
   HttpError,
   JsonError,
+  TimeoutError,
   TransportError,
 } from './errors.js';

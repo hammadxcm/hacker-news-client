@@ -11,6 +11,30 @@ library in this repository simultaneously.
 
 ## [Unreleased]
 
+### Changed
+
+- **JavaScript + TypeScript linting and formatting migrated from ESLint + Prettier
+  to [Biome](https://biomejs.dev) v2.4.** Single Rust-based tool replaces
+  `eslint`, `@eslint/js`, `@typescript-eslint/*`, `typescript-eslint`, and
+  `prettier` — roughly 10× faster than the ESLint+Prettier pipeline, one
+  `biome.json` config replaces five, and import sorting is now automatic
+  (none before).
+  - `biome.json` at repo root — recommended ruleset plus extra strict
+    `correctness`/`style`/`suspicious`/`security` rules (`noUnusedImports`,
+    `useImportType`/`useExportType`, `useNodejsImportProtocol`,
+    `useTemplate`, `useOptionalChain`, `useConst`, `noDoubleEquals`).
+  - Scripts: `lint:js` / `lint:ts` / `lint:web` / `lint:fix` / `format` /
+    `ci:biome` now wrap Biome commands. `npm run lint` aggregate unchanged.
+  - `.github/workflows/lint.yml` — two ESLint steps replaced with one
+    `biome ci` step.
+  - `lint-staged` — JS/TS + JSON/JSONC files now routed through Biome.
+  - Removed: `js/eslint.config.js`, `ts/eslint.config.js`, `js/.prettierrc.json`,
+    `.prettierignore`.
+  - Removed from devDeps: `eslint`, `@eslint/js`, `@typescript-eslint/*`,
+    `typescript-eslint`, `prettier` (~80 MB of `node_modules`).
+  - Per-language linters unchanged: ruff (Python), RuboCop (Ruby),
+    `go vet`+`gofmt` (Go), clippy+rustfmt (Rust).
+
 ### Added
 
 - Professional open-source documentation set (`CONTRIBUTING.md`,

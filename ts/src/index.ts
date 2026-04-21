@@ -5,24 +5,25 @@
  * const client = new HackerNewsClient();
  * const item = await client.item(1);
  */
-export { HackerNewsClient } from './client.ts';
+
 export type { HackerNewsClientOptions } from './client.ts';
+export { HackerNewsClient } from './client.ts';
 export {
   HackerNewsError,
-  TimeoutError,
   HttpError,
   JsonError,
+  TimeoutError,
   TransportError,
 } from './errors.ts';
 export type {
+  Comment,
+  CommentTreeNode,
   Item,
   ItemType,
-  Story,
-  Comment,
   Job,
   Poll,
   PollOpt,
-  User,
+  Story,
   Updates,
-  CommentTreeNode,
+  User,
 } from './types.ts';

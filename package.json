@@ -11,9 +11,13 @@
   "scripts": {
     "prepare": "husky",
     "test": "bash scripts/verify.sh",
-    "lint": "npm run lint:js && npm run lint:ts && npm run lint:py && npm run lint:ruby && npm run lint:go && npm run lint:rust",
-    "lint:js": "eslint js/src js/test js/example.js --config js/eslint.config.js",
-    "lint:ts": "eslint ts/src ts/test ts/example.ts --config ts/eslint.config.js",
+    "lint": "npm run lint:web && npm run lint:py && npm run lint:ruby && npm run lint:go && npm run lint:rust",
+    "lint:js": "biome check js",
+    "lint:ts": "biome check ts",
+    "lint:web": "biome check js ts",
+    "lint:fix": "biome check --write js ts",
+    "format": "biome format --write .",
+    "ci:biome": "biome ci js ts",
     "lint:py": "ruff check python/src python/tests",
     "lint:ruby": "cd ruby && bundle exec rubocop",
     "lint:go": "cd go && go vet ./... && test -z \"$(gofmt -l .)\"",
@@ -27,25 +31,18 @@
     "coverage:rust": "cd rust && cargo llvm-cov --tests --summary-only"
   },
   "devDependencies": {
-    "@eslint/js": "^9.13.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
+    "@biomejs/biome": "^2.4.12",
     "c8": "^10.1.2",
-    "eslint": "^9.13.0",
     "husky": "^9.1.0",
     "lint-staged": "^15.2.0",
-    "prettier": "^3.3.0",
-    "typescript": "^5.6.0",
-    "typescript-eslint": "^8.0.0"
+    "typescript": "^5.6.0"
   },
   "lint-staged": {
-    "js/**/*.{js,mjs}": [
-      "eslint --fix --config js/eslint.config.js",
-      "prettier --write"
+    "{js,ts}/**/*.{js,mjs,ts}": [
+      "biome check --write --no-errors-on-unmatched"
     ],
-    "ts/**/*.ts": [
-      "eslint --fix --config js/eslint.config.js",
-      "prettier --write"
+    "*.{json,jsonc}": [
+      "biome format --write --no-errors-on-unmatched"
     ],
     "python/**/*.py": [
       "ruff check --fix",

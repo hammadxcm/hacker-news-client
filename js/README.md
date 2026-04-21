@@ -113,7 +113,7 @@ For strict static typing, see the TypeScript sibling: [`@hacker-news/client-ts`]
 ```bash
 cd js
 node --test test/*.test.js     # 37 tests: 16 integration + 21 unit
-npm run lint                    # ESLint flat config
+npm run lint                    # Biome (lint + format + import sort)
 ```
 
 Coverage: 100% statements, branches, functions, and lines. Measured via `c8` at the monorepo root (`npm run coverage:js`).

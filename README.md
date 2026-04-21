@@ -83,7 +83,7 @@ A production-quality client suite for the official [Hacker News Firebase API](ht
 | 10s total timeout, budget enforced end-to-end | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Injectable transport for tests / middleware | ✓ | ✓ | ✓ | ✓ | ✓ | — |
 | Doc comments on every public symbol | JSDoc | TSDoc | Google | godoc | YARD | rustdoc |
-| Strict-mode linter | ESLint | ESLint+TS | ruff | `go vet`+`gofmt` | RuboCop | clippy+fmt |
+| Strict-mode linter | Biome | Biome | ruff | `go vet`+`gofmt` | RuboCop | clippy+fmt |
 
 <hr>
 
@@ -269,7 +269,7 @@ npm test               # runs scripts/verify.sh — all six language suites
 Per-language iteration:
 
 ```bash
-npm run lint           # ESLint, ruff, rubocop, go vet+gofmt, clippy, cargo fmt
+npm run lint           # Biome, ruff, rubocop, go vet+gofmt, clippy, cargo fmt
 npm run coverage       # generates coverage reports per language
 node --test test/*.test.js                   # mock server only
 cd js     && node --test test/*.test.js      # js unit + integration
@@ -306,8 +306,7 @@ Every PR runs through an extensive free-for-OSS tooling stack. Every tool below 
 
 | Tool | What it catches |
 |---|---|
-| **ESLint + Prettier** | JavaScript / TypeScript style + correctness |
-| **typescript-eslint** | TS-specific static analysis |
+| **[Biome](https://biomejs.dev)** | JavaScript + TypeScript lint + format + import sorting (single Rust-based tool; 10–20× faster than ESLint+Prettier) |
 | **ruff** | Python style + correctness (replaces flake8 / isort / pylint) |
 | **mypy --strict** | Python static types |
 | **RuboCop** | Ruby style + correctness |
