@@ -1,0 +1,28 @@
+{
+  "name": "@hacker-news/client-ts",
+  "version": "0.1.0",
+  "description": "Strict TypeScript client for the Hacker News Firebase API.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test --experimental-strip-types --disable-warning=ExperimentalWarning test/*.test.ts",
+    "example": "node --experimental-strip-types --disable-warning=ExperimentalWarning example.ts"
+  },
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "keywords": ["hacker-news", "hackernews", "hn", "api", "client", "typescript"],
+  "license": "MIT"
+}
