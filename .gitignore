@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# JS / TS
+node_modules/
+dist/
+*.tsbuildinfo
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+poetry.lock
+uv.lock
+
+# Ruby
+.bundle/
+vendor/
+Gemfile.lock
+
+# Rust
+target/
+Cargo.lock
+
+# Editor
+.idea/
+.vscode/
+*.swp
