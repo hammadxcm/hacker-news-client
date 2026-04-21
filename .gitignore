@@ -5,9 +5,11 @@
 node_modules/
 dist/
 *.tsbuildinfo
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
+# Note: package-lock.json IS committed at the monorepo root for reproducible
+# CI and Dependabot updates. Workspaces (js/, ts/) inherit the root lock,
+# so no per-workspace lock is needed.
 
 # Coverage output
 coverage/
