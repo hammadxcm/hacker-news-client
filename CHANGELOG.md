@@ -11,6 +11,25 @@ library in this repository simultaneously.
 
 ## [Unreleased]
 
+### Changed (Ruby — BREAKING for pre-release consumers)
+
+- **Ruby gem renamed `hacker_news_client` → `hacker_news`** and module renamed
+  `HackerNewsClient` → `HackerNews`. Callsite goes from
+  `HackerNewsClient::Client.new` → `HackerNews::Client.new`, aligning with
+  industry-idiomatic Ruby gems (Faraday::Connection, Stripe::Customer,
+  Aws::S3::Client). Eliminates the "Client" duplication.
+  - Renamed files: `ruby/lib/hacker_news_client.rb` → `ruby/lib/hacker_news.rb`;
+    directory `ruby/lib/hacker_news_client/` → `ruby/lib/hacker_news/`;
+    gemspec `hacker_news_client.gemspec` → `hacker_news.gemspec`.
+  - All sub-classes re-namespaced under `HackerNews::` — Story, Comment, Job,
+    Poll, PollOpt, User, Updates, CommentTreeNode, Error (+ HttpError,
+    JsonError, TimeoutError, TransportError), VERSION.
+  - `scripts/bump-version.sh` updated to write into `ruby/lib/hacker_news/version.rb`.
+  - Docs updated: ruby/README.md (including shields.io + rubygems.org badge
+    URLs), root README.md Ruby quick-start, DESIGN.md §9, RESEARCH.md §4 + §6,
+    CONTRIBUTING.md "adding a method" file list, docs/ARCHITECTURE.md table.
+  - Gem was unpublished at v0.1.0; no backward-compat alias was added.
+
 ### Changed
 
 - **JavaScript + TypeScript linting and formatting migrated from ESLint + Prettier
