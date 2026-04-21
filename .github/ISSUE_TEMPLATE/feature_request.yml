@@ -1,0 +1,80 @@
+name: Feature request
+description: Suggest a new feature or API addition.
+title: "feat: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for proposing a feature. For open-ended design discussions, consider starting with a [Discussion](https://github.com/hammadkhan/hacker-news-client/discussions/categories/ideas) — we can move it to an issue once the design is more concrete.
+
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language scope
+      description: Which language(s) should this feature target? Remember — this project ships features in lockstep across all six.
+      multiple: true
+      options:
+        - All six (standard for any new method)
+        - JavaScript (js/)
+        - TypeScript (ts/)
+        - Python (python/)
+        - Ruby (ruby/)
+        - Go (go/)
+        - Rust (rust/)
+        - Shared infrastructure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: |
+        What problem does this feature solve? Describe the use case, not the solution.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: |
+        How should the feature work? Be specific about the public API shape.
+        Example signatures welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you looked at and why you rejected them.
+
+  - type: textarea
+    id: prior-art
+    attributes:
+      label: Prior art
+      description: |
+        Links to similar features in other HN clients, related RFCs, or the
+        upstream Firebase docs.
+
+  - type: textarea
+    id: implementation-notes
+    attributes:
+      label: Implementation notes
+      description: |
+        If you're thinking about implementing this yourself, outline how you'd
+        approach it. Review [`DESIGN.md`](https://github.com/hammadkhan/hacker-news-client/blob/main/DESIGN.md) first — the contract is load-bearing.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues and discussions.
+          required: true
+        - label: This feature is consistent with the DESIGN.md contract (or I've described how to extend it).
+          required: true
+        - label: I understand that accepted features must be implemented in all six languages.
+          required: true

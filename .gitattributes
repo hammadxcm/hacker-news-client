@@ -1,0 +1,43 @@
+# Normalize line endings across all platforms.
+* text=auto eol=lf
+
+# Binary files — never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.tar binary
+
+# Language-specific files — explicit text declarations for clarity.
+*.js      text eol=lf
+*.mjs     text eol=lf
+*.cjs     text eol=lf
+*.ts      text eol=lf
+*.tsx     text eol=lf
+*.json    text eol=lf
+*.md      text eol=lf
+*.py      text eol=lf
+*.rb      text eol=lf
+*.go      text eol=lf
+*.rs      text eol=lf
+*.toml    text eol=lf
+*.yaml    text eol=lf
+*.yml     text eol=lf
+*.sh      text eol=lf
+Gemfile   text eol=lf
+Rakefile  text eol=lf
+gemspec   text eol=lf
+
+# GitHub language statistics: exclude vendored / generated paths.
+test/fixtures/**/*.json linguist-generated=true
+**/*.test.js            linguist-detectable=true
+**/*.test.ts            linguist-detectable=true

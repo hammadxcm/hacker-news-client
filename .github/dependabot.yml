@@ -1,0 +1,101 @@
+version: 2
+
+updates:
+  # Root npm monorepo (husky, eslint, prettier, c8, etc.)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # JS workspace
+  - package-ecosystem: "npm"
+    directory: "/js"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(js)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # TS workspace
+  - package-ecosystem: "npm"
+    directory: "/ts"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(ts)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "typescript"
+
+  # Python
+  - package-ecosystem: "pip"
+    directory: "/python"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(python)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+
+  # Ruby
+  - package-ecosystem: "bundler"
+    directory: "/ruby"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(ruby)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "ruby"
+
+  # Go
+  - package-ecosystem: "gomod"
+    directory: "/go"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(go)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "go"
+
+  # Rust
+  - package-ecosystem: "cargo"
+    directory: "/rust"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(rust)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "rust"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"

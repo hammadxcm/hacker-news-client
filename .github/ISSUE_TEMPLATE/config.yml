@@ -1,0 +1,14 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or how-to
+    url: https://github.com/hammadkhan/hacker-news-client/discussions/categories/q-a
+    about: Ask "how do I do X?" in GitHub Discussions. Issues are for bugs and feature requests.
+  - name: Idea or design discussion
+    url: https://github.com/hammadkhan/hacker-news-client/discussions/categories/ideas
+    about: Propose or discuss a potential feature in Discussions before filing an issue.
+  - name: Security vulnerability
+    url: https://github.com/hammadkhan/hacker-news-client/security/advisories/new
+    about: Report privately via GitHub Security Advisories. DO NOT use public issues.
+  - name: Support guide
+    url: https://github.com/hammadkhan/hacker-news-client/blob/main/SUPPORT.md
+    about: Not sure where to post? Start here.

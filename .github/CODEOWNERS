@@ -1,0 +1,36 @@
+# CODEOWNERS — default reviewers for the repository.
+#
+# Syntax: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo.
+*                           @hammadkhan
+
+# Per-language ownership (override the default). Currently identical to the
+# default; listed explicitly so additional owners can be added per language
+# without touching the global rule.
+/js/                        @hammadkhan
+/ts/                        @hammadkhan
+/python/                    @hammadkhan
+/ruby/                      @hammadkhan
+/go/                        @hammadkhan
+/rust/                      @hammadkhan
+
+# Shared infrastructure.
+/test/                      @hammadkhan
+/scripts/                   @hammadkhan
+
+# Documentation and community health.
+/docs/                      @hammadkhan
+/.github/                   @hammadkhan
+/README.md                  @hammadkhan
+/CONTRIBUTING.md            @hammadkhan
+/CODE_OF_CONDUCT.md         @hammadkhan
+/SECURITY.md                @hammadkhan
+/CHANGELOG.md               @hammadkhan
+/SUPPORT.md                 @hammadkhan
+/DESIGN.md                  @hammadkhan
+/RESEARCH.md                @hammadkhan
+
+# CI and tooling.
+/.github/workflows/         @hammadkhan
+/package.json               @hammadkhan

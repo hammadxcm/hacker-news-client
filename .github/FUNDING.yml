@@ -1,0 +1,11 @@
+# Enable funding options for this repository. Uncomment the lines you want
+# to use and fill in the appropriate username/URL.
+#
+# Docs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/displaying-a-sponsor-button-in-your-repository
+
+# github: [hammadkhan]
+# patreon: username
+# open_collective: project-name
+# ko_fi: username
+# tidelift: npm/hacker-news-client
+# custom: ["https://example.com/donate"]

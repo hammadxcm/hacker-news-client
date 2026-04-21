@@ -1,0 +1,74 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: All linters
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          working-directory: ruby
+          bundler-cache: true
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache-dependency-path: go/go.sum
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust -> target
+
+      - name: Install root dev dependencies
+        run: npm ci
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: ESLint (JavaScript)
+        run: npm run lint:js
+
+      - name: ESLint + typescript-eslint (TypeScript)
+        run: npm run lint:ts
+
+      - name: ruff (Python)
+        run: npm run lint:py
+
+      - name: RuboCop (Ruby)
+        run: npm run lint:ruby
+
+      - name: go vet + gofmt (Go)
+        run: npm run lint:go
+
+      - name: clippy + rustfmt (Rust)
+        run: npm run lint:rust
