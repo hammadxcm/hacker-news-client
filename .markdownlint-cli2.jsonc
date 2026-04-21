@@ -1,0 +1,40 @@
+// markdownlint-cli2 configuration.
+// Docs: https://github.com/DavidAnson/markdownlint-cli2
+{
+  "config": {
+    "default": true,
+    // MD013 (line-length) — disabled; prose in READMEs is long-form by design.
+    "MD013": false,
+    // MD033 (no-inline-html) — disabled; we use <details>, <div align>, <br>.
+    "MD033": false,
+    // MD041 (first-line-heading) — disabled; per-language READMEs open with badges.
+    "MD041": false,
+    // MD024 (no-duplicate-heading) — allow same heading in sibling sections.
+    "MD024": { "siblings_only": true },
+    // MD036 (no-emphasis-as-heading) — false positives on shield-badge rows.
+    "MD036": false,
+    // MD004 (ul-style) — dashes (matches project prose).
+    "MD004": { "style": "dash" },
+    // MD007 (ul-indent) — 2-space indent.
+    "MD007": { "indent": 2 },
+    // MD060 (table-column-style) — disabled; our tables mix wide/narrow cols.
+    "MD060": false,
+    // MD051 (link-fragments) — false positives on badge rows with in-page anchors.
+    "MD051": false,
+    // MD040 (fenced-code-language) — relax for bare ```blocks in prose examples.
+    "MD040": false,
+    // MD014 (commands-show-output) — we use $ prefix in install snippets.
+    "MD014": false
+  },
+  "ignores": [
+    "node_modules/**",
+    "**/node_modules/**",
+    "**/target/**",
+    "**/coverage/**",
+    "**/dist/**",
+    "**/vendor/**",
+    "test/fixtures/**",
+    "ruby/coverage/**",
+    "docs/superpowers/**"
+  ]
+}

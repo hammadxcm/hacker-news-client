@@ -119,6 +119,7 @@ Every library has two test suites:
 2. **Unit** (`test/test_unit.*`, `tests/test_unit.py`, `tests/unit.rs`): mocks the HTTP transport directly (per-language mechanism). Exercises pure decode/error-mapping/concurrency logic without any network.
 
 Both matter:
+
 - Integration proves the wire contract is honored.
 - Unit gives fast feedback (< 1s) and keeps coverage high for error paths.
 

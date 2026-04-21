@@ -70,15 +70,18 @@ Five variants tagged by the wire `type` field: `story`, `comment`, `job`, `poll`
 ### Per-language rendering
 
 **TypeScript**
+
 ```ts
 export type Item = Story | Comment | Job | Poll | PollOpt;
 export interface Story { type: 'story'; id: number; /* ... */ }
 export interface Comment { type: 'comment'; id: number; /* ... */ }
 // etc. — literal `type` field is the discriminator
 ```
+
 Config: `strict: true`, `noUncheckedIndexedAccess: true`.
 
 **Rust**
+
 ```rust
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
@@ -91,9 +94,11 @@ pub enum Item {
     PollOpt(PollOpt),
 }
 ```
+
 Explicit `#[serde(rename = "pollopt")]` is defensive — `rename_all = "lowercase"` happens to produce `pollopt` from `PollOpt`, but the behaviour depends on implementation details; the explicit rename is self-documenting.
 
 **Python**
+
 ```python
 @dataclass(frozen=True)
 class Story:
@@ -107,9 +112,11 @@ class Story:
 
 Item: TypeAlias = Story | Comment | Job | Poll | PollOpt
 ```
+
 Callers use `match item: case Story(...):`.
 
 **Ruby**
+
 ```ruby
 module HackerNews
   class Item
@@ -129,6 +136,7 @@ end
 ```
 
 **Go**
+
 ```go
 type Item interface{ isItem() }
 
@@ -139,6 +147,7 @@ func (Story) isItem() {}
 // Custom decoder peeks at "type" and dispatches:
 func unmarshalItem(data []byte) (Item, error) { /* ... */ }
 ```
+
 The unexported `isItem()` tag method seals the interface. **Callers decode via the package's decoder, not directly via `json.Unmarshal`** — this is load-bearing; without the dispatcher, Go users cannot parse responses into the interface.
 
 **JavaScript**

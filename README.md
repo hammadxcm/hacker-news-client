@@ -13,8 +13,10 @@ A production-quality client suite for the official [Hacker News Firebase API](ht
 [![CI](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/ci.yml?branch=main&style=flat-square&label=ci&logo=githubactions&logoColor=white)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/ci.yml)
 [![Lint](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/lint.yml?branch=main&style=flat-square&label=lint&logo=eslint&logoColor=white)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/lint.yml)
 [![CodeQL](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/codeql.yml?branch=main&style=flat-square&label=codeql&logo=github)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/codeql.yml)
+[![Scorecard](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/scorecard.yml?branch=main&style=flat-square&label=scorecard&logo=openssf&logoColor=white)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/scorecard.yml)
+[![Supply chain](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/supply-chain.yml?branch=main&style=flat-square&label=supply-chain&logo=dependabot&logoColor=white)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/supply-chain.yml)
+[![Codecov](https://img.shields.io/codecov/c/github/hammadxcm/hacker-news-client?style=flat-square&logo=codecov&logoColor=white)](https://codecov.io/gh/hammadxcm/hacker-news-client)
 [![Tests](https://img.shields.io/badge/tests-248%20passing-brightgreen.svg?style=flat-square&logo=pytest&logoColor=white)](./scripts/verify.sh)
-[![Coverage](https://img.shields.io/badge/coverage-~100%25-brightgreen.svg?style=flat-square)](#coverage)
 [![Conventional Commits](https://img.shields.io/badge/Conventional_Commits-1.0.0-FE5196.svg?style=flat-square&logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor_Covenant-2.1-4baaaa.svg?style=flat-square)](./CODE_OF_CONDUCT.md)
 
@@ -295,6 +297,40 @@ Measured per language in CI and locally via `npm run coverage`:
 | Rust | 94.4% | — | [`cargo-llvm-cov`](https://github.com/taiki-e/cargo-llvm-cov) |
 
 The sub-100% cells are language-tooling quirks: Go's coverage tracer doesn't track inlined no-op tag methods, and Rust has a few concurrency-race branches that aren't deterministically reachable from tests.
+
+<hr>
+
+## Quality and security tooling
+
+Every PR runs through an extensive free-for-OSS tooling stack. Every tool below is free for open-source projects and requires no paid tier or secret.
+
+| Tool | What it catches |
+|---|---|
+| **ESLint + Prettier** | JavaScript / TypeScript style + correctness |
+| **typescript-eslint** | TS-specific static analysis |
+| **ruff** | Python style + correctness (replaces flake8 / isort / pylint) |
+| **mypy --strict** | Python static types |
+| **RuboCop** | Ruby style + correctness |
+| **go vet + gofmt** | Go style + correctness (stdlib) |
+| **clippy + rustfmt** | Rust style + correctness |
+| **markdownlint-cli2** | Documentation style |
+| **actionlint** | GitHub Actions workflow correctness |
+| **shellcheck** | Shell script bugs + portability |
+| **editorconfig-checker** | Consistent line endings, indentation |
+| **CodeQL** | Semantic security analysis (JS/TS/Python/Ruby/Go) |
+| **OSSF Scorecard** | Open-source best-practices scoring |
+| **Dependabot** | Weekly dependency updates across all ecosystems |
+| **dependency-review-action** | Per-PR diff of new dependencies + CVEs |
+| **gitleaks** | Secret scanning across full git history |
+| **npm audit** | Node.js CVE scanning |
+| **pip-audit** | Python CVE scanning (PyPA) |
+| **bundler-audit** | Ruby CVE scanning (RubySec) |
+| **govulncheck** | Go CVE scanning (official) |
+| **cargo-audit** | Rust CVE scanning (RustSec) |
+| **Codecov** | Per-language coverage upload + PR comments |
+| **Husky + lint-staged** | Local pre-commit + pre-push gates |
+
+All of these run automatically on every PR via the workflows under [`.github/workflows/`](./.github/workflows/).
 
 <hr>
 

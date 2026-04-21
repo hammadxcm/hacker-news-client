@@ -1,0 +1,56 @@
+# Non-language-specific code-quality linters: workflows, shell, Markdown, editorconfig.
+name: Code quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    name: actionlint (GitHub workflows)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: reviewdog/action-actionlint@v1
+        with:
+          fail_on_error: true
+          reporter: github-check
+
+  shellcheck:
+    name: shellcheck (shell scripts)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ludeeus/action-shellcheck@master
+        with:
+          severity: warning
+          scandir: ./scripts
+          additional_files: "./.husky/pre-commit ./.husky/pre-push"
+
+  markdownlint:
+    name: markdownlint (docs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DavidAnson/markdownlint-cli2-action@v16
+        with:
+          globs: |
+            **/*.md
+            !node_modules
+            !**/target
+            !**/coverage
+            !**/dist
+            !**/vendor
+
+  editorconfig:
+    name: editorconfig-checker
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: editorconfig-checker/action-editorconfig-checker@v2

@@ -1,0 +1,146 @@
+# Per-language coverage upload to Codecov. Free for public repos; tokenless.
+name: Coverage
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  js:
+    name: JS coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - name: Run c8
+        run: npx c8 --reporter=lcov --reports-dir=coverage/js --include='js/src/**' node --test js/test/*.test.js
+      - uses: codecov/codecov-action@v5
+        with:
+          files: coverage/js/lcov.info
+          flags: js
+          fail_ci_if_error: false
+
+  ts:
+    name: TS coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+      - run: npm ci
+      - name: Run c8
+        run: npx c8 --reporter=lcov --reports-dir=coverage/ts --include='ts/src/**' --exclude='ts/src/**/*.d.ts' node --test --experimental-strip-types --disable-warning=ExperimentalWarning ts/test/*.test.ts
+      - uses: codecov/codecov-action@v5
+        with:
+          files: coverage/ts/lcov.info
+          flags: typescript
+          fail_ci_if_error: false
+
+  python:
+    name: Python coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install coverage
+        run: pip install coverage
+      - name: Run coverage
+        working-directory: python
+        run: |
+          python -m coverage run --source=src/hacker_news_client -m unittest tests.test_client tests.test_unit
+          python -m coverage xml -o coverage.xml
+      - uses: codecov/codecov-action@v5
+        with:
+          files: python/coverage.xml
+          flags: python
+          fail_ci_if_error: false
+
+  go:
+    name: Go coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache-dependency-path: go/go.sum
+      - name: Run coverage
+        working-directory: go
+        run: go test -coverprofile=coverage.out ./...
+      - uses: codecov/codecov-action@v5
+        with:
+          files: go/coverage.out
+          flags: go
+          fail_ci_if_error: false
+
+  ruby:
+    name: Ruby coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          working-directory: ruby
+          bundler-cache: true
+      - name: Install simplecov-lcov for Codecov
+        working-directory: ruby
+        run: gem install simplecov simplecov-lcov
+      - name: Run tests with coverage
+        working-directory: ruby
+        env:
+          COVERAGE: "1"
+        run: bundle exec rake test
+      - uses: codecov/codecov-action@v5
+        with:
+          files: ruby/coverage/coverage.xml,ruby/coverage/.resultset.json
+          flags: ruby
+          fail_ci_if_error: false
+
+  rust:
+    name: Rust coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust -> target
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Generate lcov
+        working-directory: rust
+        run: cargo llvm-cov --tests --lcov --output-path lcov.info
+      - uses: codecov/codecov-action@v5
+        with:
+          files: rust/lcov.info
+          flags: rust
+          fail_ci_if_error: false

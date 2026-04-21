@@ -12,6 +12,7 @@ library in this repository simultaneously.
 ## [Unreleased]
 
 ### Added
+
 - Professional open-source documentation set (`CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, `AUTHORS.md`).
 - Redesigned root `README.md` with hero block, shields.io badges, tech-icon
@@ -29,6 +30,20 @@ library in this repository simultaneously.
   - `workflows/lint.yml` — aggregate `npm run lint` across all languages
   - `workflows/codeql.yml` — GitHub's managed security scan for JS/TS/Python/
     Ruby/Go
+- Free-for-OSS security + quality tooling, no secrets required:
+  - `workflows/scorecard.yml` — OSSF Scorecard, weekly.
+  - `workflows/supply-chain.yml` — npm audit, pip-audit, bundler-audit,
+    govulncheck, cargo-audit, and `dependency-review-action` on PRs.
+  - `workflows/secret-scan.yml` — gitleaks on every PR + weekly.
+  - `workflows/code-quality.yml` — actionlint, shellcheck, markdownlint-cli2,
+    editorconfig-checker.
+  - `workflows/coverage.yml` — uploads per-language coverage to
+    [Codecov](https://codecov.io) (tokenless for public repos).
+- `codecov.yml` and `.markdownlint-cli2.jsonc` configuration files.
+- Repository ownership: GitHub user corrected from the guessed
+  `@hammadkhan` to the actual `@hammadxcm` across all docs, CODEOWNERS,
+  issue/PR templates, workflow badges, and the Go module path
+  (`github.com/hammadxcm/hacker-news-client/go`).
 
 ## [0.1.0] — 2026-04-21
 
@@ -102,7 +117,7 @@ Uniform across all six languages with language-idiomatic surfaces:
   (full verification harness).
 - Per-language linting: ESLint (flat config) + Prettier (JS/TS), ruff
   (Python), RuboCop (Ruby), `go vet` + `gofmt` (Go), `cargo clippy`
-  + `cargo fmt` (Rust).
+  - `cargo fmt` (Rust).
 - Per-language doc comments: JSDoc, TSDoc, Google-style Python docstrings,
   YARD, godoc, rustdoc (`#![deny(missing_docs)]`).
 

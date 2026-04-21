@@ -1,0 +1,59 @@
+# Codecov configuration.
+# Docs: https://docs.codecov.com/docs/codecovyml-reference
+
+codecov:
+  require_ci_to_pass: true
+
+coverage:
+  precision: 2
+  round: down
+  range: "80...100"
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+        informational: false
+    patch:
+      default:
+        target: 90%
+        threshold: 5%
+
+# One coverage flag per language. CI uploads each separately.
+flag_management:
+  default_rules:
+    carryforward: true
+    statuses:
+      - type: project
+        target: auto
+        threshold: 1%
+  individual_flags:
+    - name: js
+      paths: [js/src]
+    - name: typescript
+      paths: [ts/src]
+    - name: python
+      paths: [python/src]
+    - name: ruby
+      paths: [ruby/lib]
+    - name: go
+      paths: [go]
+    - name: rust
+      paths: [rust/src]
+
+# Ignore generated / vendored paths.
+ignore:
+  - "test/fixtures/**"
+  - "**/*.test.js"
+  - "**/*.test.ts"
+  - "**/example*.*"
+  - "**/examples/**"
+  - "go/example/**"
+  - "coverage/**"
+  - "**/target/**"
+  - "**/dist/**"
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
