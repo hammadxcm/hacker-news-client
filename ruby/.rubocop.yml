@@ -11,3 +11,29 @@ Metrics:
 
 Layout/LineLength:
   Max: 120
+
+# Short helper parameter names (`h` for Hash, `k` for key, etc.) are idiomatic
+# in tiny factory methods — don't enforce min length.
+Naming/MethodParameterName:
+  Enabled: false
+
+# Test names like `test_http_500` encode the HTTP status as a number — that's
+# the correct, readable convention for this project.
+Naming/VariableNumber:
+  Enabled: false
+
+# Test helpers use class variables to share subprocess state across tests.
+# This is a well-scoped pattern inside a single test file.
+Style/ClassVars:
+  Exclude:
+    - "test/**/*.rb"
+
+# URI.open against a trusted localhost mock in test fixtures is safe.
+Security/Open:
+  Exclude:
+    - "test/**/*.rb"
+
+# `it` is a common local-variable name in our tests; it rarely collides with
+# the block param convention in the contexts we use.
+Style/ItAssignment:
+  Enabled: false

@@ -1,4 +1,4 @@
-import { HackerNewsError, HttpError, JsonError, TimeoutError, TransportError } from './errors.js';
+import { HttpError, JsonError, TimeoutError, TransportError } from './errors.js';
 
 const DEFAULT_BASE_URL = 'https://hacker-news.firebaseio.com/v0';
 const DEFAULT_TIMEOUT_MS = 10_000;

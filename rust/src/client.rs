@@ -195,20 +195,36 @@ impl HackerNewsClient {
     }
 
     /// Up-to-500 top stories (ranked).
-    pub async fn top_story_ids(&self) -> Result<Vec<u64>> { self.id_list("/topstories.json").await }
+    pub async fn top_story_ids(&self) -> Result<Vec<u64>> {
+        self.id_list("/topstories.json").await
+    }
     /// Up-to-500 newest stories (reverse-chronological).
-    pub async fn new_story_ids(&self) -> Result<Vec<u64>> { self.id_list("/newstories.json").await }
+    pub async fn new_story_ids(&self) -> Result<Vec<u64>> {
+        self.id_list("/newstories.json").await
+    }
     /// Best stories.
-    pub async fn best_story_ids(&self) -> Result<Vec<u64>> { self.id_list("/beststories.json").await }
+    pub async fn best_story_ids(&self) -> Result<Vec<u64>> {
+        self.id_list("/beststories.json").await
+    }
     /// Up-to-200 Ask HN stories.
-    pub async fn ask_story_ids(&self) -> Result<Vec<u64>> { self.id_list("/askstories.json").await }
+    pub async fn ask_story_ids(&self) -> Result<Vec<u64>> {
+        self.id_list("/askstories.json").await
+    }
     /// Up-to-200 Show HN stories.
-    pub async fn show_story_ids(&self) -> Result<Vec<u64>> { self.id_list("/showstories.json").await }
+    pub async fn show_story_ids(&self) -> Result<Vec<u64>> {
+        self.id_list("/showstories.json").await
+    }
     /// Up-to-200 job listings.
-    pub async fn job_story_ids(&self) -> Result<Vec<u64>> { self.id_list("/jobstories.json").await }
+    pub async fn job_story_ids(&self) -> Result<Vec<u64>> {
+        self.id_list("/jobstories.json").await
+    }
 
     async fn hydrate(&self, ids: Vec<u64>, limit: usize) -> Result<Vec<Item>> {
-        let slice = if ids.len() > limit { &ids[..limit] } else { &ids[..] };
+        let slice = if ids.len() > limit {
+            &ids[..limit]
+        } else {
+            &ids[..]
+        };
         self.items(slice).await
     }
 
@@ -268,7 +284,10 @@ impl HackerNewsClient {
         let kid_ids = comment.kids.clone();
 
         if kid_ids.is_empty() {
-            return Ok(Some(CommentTreeNode { comment, replies: Vec::new() }));
+            return Ok(Some(CommentTreeNode {
+                comment,
+                replies: Vec::new(),
+            }));
         }
 
         // Fan-out children in parallel with fail-fast cancellation. Results

@@ -7,19 +7,18 @@ operations. Fails fast on HTTP or transport errors mid-batch.
 
 from __future__ import annotations
 
+import builtins
 import json
 import os
 import socket
 import threading
 import urllib.error
 import urllib.request
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import replace
-from typing import Callable
 
-from .errors import HackerNewsError, HttpError, JsonError, TimeoutError, TransportError
+from .errors import HttpError, JsonError, TimeoutError, TransportError
 from .types import (
-    Comment,
     CommentTreeNode,
     Item,
     Updates,
@@ -90,7 +89,7 @@ class HackerNewsClient:
             if isinstance(reason, (socket.timeout, TimeoutError)):
                 raise TimeoutError("hn: timeout", url=url) from err
             raise TransportError("hn: transport failure", url=url) from err
-        except socket.timeout as err:
+        except builtins.TimeoutError as err:
             raise TimeoutError("hn: timeout", url=url) from err
         try:
             return json.loads(raw.decode("utf-8"))

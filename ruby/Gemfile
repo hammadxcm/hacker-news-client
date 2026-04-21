@@ -1,10 +1,12 @@
-source "https://rubygems.org"
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
 
 gemspec
 
 group :development, :test do
-  gem "rake"
-  gem "minitest", "~> 5"
-  gem "rubocop", require: false
-  gem "rubocop-minitest", require: false
+  gem 'minitest', '~> 5'
+  gem 'rake'
+  gem 'rubocop', require: false
+  gem 'rubocop-minitest', require: false
 end

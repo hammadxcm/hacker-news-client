@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# Pre-push gate: the full cross-language verification harness.
+# This takes ~10-20s on a warm cache; acceptable before push.
+
+bash scripts/verify.sh

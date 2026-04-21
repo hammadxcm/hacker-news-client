@@ -65,10 +65,22 @@ async fn item_story() {
 #[tokio::test]
 async fn item_each_variant() {
     let c = client();
-    assert!(matches!(c.item(8001).await.unwrap().unwrap(), Item::Comment(_)));
-    assert!(matches!(c.item(192_327).await.unwrap().unwrap(), Item::Job(_)));
-    assert!(matches!(c.item(126_809).await.unwrap().unwrap(), Item::Poll(_)));
-    assert!(matches!(c.item(126_810).await.unwrap().unwrap(), Item::PollOpt(_)));
+    assert!(matches!(
+        c.item(8001).await.unwrap().unwrap(),
+        Item::Comment(_)
+    ));
+    assert!(matches!(
+        c.item(192_327).await.unwrap().unwrap(),
+        Item::Job(_)
+    ));
+    assert!(matches!(
+        c.item(126_809).await.unwrap().unwrap(),
+        Item::Poll(_)
+    ));
+    assert!(matches!(
+        c.item(126_810).await.unwrap().unwrap(),
+        Item::PollOpt(_)
+    ));
 }
 
 #[tokio::test]

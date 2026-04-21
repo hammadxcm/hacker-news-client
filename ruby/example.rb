@@ -5,8 +5,8 @@
 #
 # Run: ruby example.rb
 
-$LOAD_PATH.unshift File.expand_path("lib", __dir__)
-require "hacker_news_client"
+$LOAD_PATH.unshift File.expand_path('lib', __dir__)
+require 'hacker_news_client'
 
 client = HackerNewsClient::Client.new
 client.top_stories(limit: 5).each do |item|

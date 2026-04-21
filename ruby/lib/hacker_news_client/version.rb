@@ -2,5 +2,5 @@
 
 module HackerNewsClient
   # Gem version. Lockstep with the sibling libraries in this monorepo.
-  VERSION = "0.1.0"
+  VERSION = '0.1.0'
 end

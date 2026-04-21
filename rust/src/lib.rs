@@ -26,4 +26,6 @@ pub use client::{
     DEFAULT_TIMEOUT,
 };
 pub use errors::{Error, Result};
-pub use items::{BaseFields, Comment, CommentTreeNode, Item, Job, Poll, PollOpt, Story, Updates, User};
+pub use items::{
+    BaseFields, Comment, CommentTreeNode, Item, Job, Poll, PollOpt, Story, Updates, User,
+};

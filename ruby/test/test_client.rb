@@ -1,29 +1,27 @@
 # frozen_string_literal: true
 
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
-require "minitest/autorun"
-require "open-uri"
-require "hacker_news_client"
+require 'minitest/autorun'
+require 'open-uri'
+require 'hacker_news_client'
 
-REPO_ROOT = File.expand_path("../..", __dir__)
+REPO_ROOT = File.expand_path('../..', __dir__)
 
 def start_mock_server
-  env = { "MOCK_PORT" => "0", "MOCK_SLOW_MS" => "100" }
-  cmd = ["node", File.join(REPO_ROOT, "test", "mock-server.js")]
+  env = { 'MOCK_PORT' => '0', 'MOCK_SLOW_MS' => '100' }
+  cmd = ['node', File.join(REPO_ROOT, 'test', 'mock-server.js')]
   r, w = IO.pipe
   pid = Process.spawn(env, *cmd, out: w, err: :err)
   w.close
   line = r.readline
-  base = line.split(" on ", 2).last.strip
+  base = line.split(' on ', 2).last.strip
   # readiness probe
   10.times do
-    begin
-      URI.open("#{base}/maxitem.json", read_timeout: 0.5).read
-      break
-    rescue StandardError
-      sleep 0.05
-    end
+    URI.open("#{base}/maxitem.json", read_timeout: 0.5).read
+    break
+  rescue StandardError
+    sleep 0.05
   end
   [pid, base, r]
 end
@@ -38,7 +36,7 @@ class ClientTest < Minitest::Test
 
     @@pid, @@base, @@stdout = start_mock_server
     Minitest.after_run do
-      Process.kill("TERM", @@pid)
+      Process.kill('TERM', @@pid)
       begin
         Process.waitpid(@@pid)
       rescue StandardError
@@ -56,8 +54,8 @@ class ClientTest < Minitest::Test
   def test_item_story
     item = @client.item(1)
     assert_kind_of HackerNewsClient::Story, item
-    assert_equal "pg", item.by
-    assert_equal "Y Combinator", item.title
+    assert_equal 'pg', item.by
+    assert_equal 'Y Combinator', item.title
   end
 
   def test_item_variants
@@ -97,10 +95,10 @@ class ClientTest < Minitest::Test
   end
 
   def test_user
-    u = @client.user("pg")
+    u = @client.user('pg')
     refute_nil u
-    assert_equal "pg", u.id
-    assert_nil @client.user("nobody")
+    assert_equal 'pg', u.id
+    assert_nil @client.user('nobody')
   end
 
   def test_max_item_and_updates
@@ -138,7 +136,7 @@ class ClientTest < Minitest::Test
 
   def test_unknown_path_404
     err = assert_raises(HackerNewsClient::HttpError) do
-      @client.user("../nonexistent-endpoint")
+      @client.user('../nonexistent-endpoint')
     end
     assert_equal 404, err.status
   end

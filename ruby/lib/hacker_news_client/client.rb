@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "json"
-require "net/http"
-require "uri"
+require 'json'
+require 'net/http'
+require 'uri'
 
 module HackerNewsClient
   # Client for the Hacker News Firebase API.
@@ -12,10 +12,10 @@ module HackerNewsClient
   #   item = client.item(1)
   #   puts item.title if item.is_a?(HackerNewsClient::Story)
   class Client
-    DEFAULT_BASE_URL = "https://hacker-news.firebaseio.com/v0"
+    DEFAULT_BASE_URL = 'https://hacker-news.firebaseio.com/v0'
     DEFAULT_TIMEOUT = 10.0
     DEFAULT_CONCURRENCY = 10
-    DEFAULT_USER_AGENT = "hn-client-ruby/#{VERSION}"
+    DEFAULT_USER_AGENT = "hn-client-ruby/#{VERSION}".freeze
     DEFAULT_STORIES_LIMIT = 30
 
     attr_reader :base_url, :timeout, :concurrency, :user_agent
@@ -26,7 +26,7 @@ module HackerNewsClient
     # @param user_agent [String]
     def initialize(base_url: nil, timeout: DEFAULT_TIMEOUT, concurrency: DEFAULT_CONCURRENCY,
                    user_agent: DEFAULT_USER_AGENT)
-      @base_url = (base_url || ENV["HN_BASE"] || DEFAULT_BASE_URL).sub(%r{/+$}, "")
+      @base_url = (base_url || ENV['HN_BASE'] || DEFAULT_BASE_URL).sub(%r{/+$}, '')
       @timeout = timeout
       @concurrency = concurrency
       @user_agent = user_agent
@@ -39,7 +39,7 @@ module HackerNewsClient
     def item(id)
       body = get_json("/item/#{id}.json")
       return nil if body.nil?
-      return nil if body.is_a?(Hash) && body["deleted"] == true
+      return nil if body.is_a?(Hash) && body['deleted'] == true
 
       Item.from_hash(body)
     end
@@ -93,27 +93,27 @@ module HackerNewsClient
 
     # @return [Integer] current largest item id.
     def max_item
-      get_json("/maxitem.json")
+      get_json('/maxitem.json')
     end
 
     # @return [Updates]
     def updates
-      body = get_json("/updates.json")
-      Updates.new(items: body["items"] || [], profiles: body["profiles"] || [])
+      body = get_json('/updates.json')
+      Updates.new(items: body['items'] || [], profiles: body['profiles'] || [])
     end
 
     # @return [Array<Integer>]
-    def top_story_ids = id_list("/topstories.json")
+    def top_story_ids = id_list('/topstories.json')
     # @return [Array<Integer>]
-    def new_story_ids = id_list("/newstories.json")
+    def new_story_ids = id_list('/newstories.json')
     # @return [Array<Integer>]
-    def best_story_ids = id_list("/beststories.json")
+    def best_story_ids = id_list('/beststories.json')
     # @return [Array<Integer>]
-    def ask_story_ids = id_list("/askstories.json")
+    def ask_story_ids = id_list('/askstories.json')
     # @return [Array<Integer>]
-    def show_story_ids = id_list("/showstories.json")
+    def show_story_ids = id_list('/showstories.json')
     # @return [Array<Integer>]
-    def job_story_ids = id_list("/jobstories.json")
+    def job_story_ids = id_list('/jobstories.json')
 
     # @param limit [Integer]
     # @return [Array<Item>]
@@ -173,17 +173,17 @@ module HackerNewsClient
         ensure
           release.call
         end
-        break nil if body.nil? || (body.is_a?(Hash) && body["deleted"] == true)
+        break nil if body.nil? || (body.is_a?(Hash) && body['deleted'] == true)
 
-        kids = body["kids"] || []
+        kids = body['kids'] || []
         replies = kids.map { |k| Thread.new { visit.call(k) } }.map(&:value).compact
         CommentTreeNode.new(
-          id: body["id"],
-          by: body["by"],
-          time: body["time"],
-          parent: body["parent"],
-          text: body["text"],
-          dead: body["dead"] == true,
+          id: body['id'],
+          by: body['by'],
+          time: body['time'],
+          parent: body['parent'],
+          text: body['text'],
+          dead: body['dead'] == true,
           kids: kids,
           replies: replies
         )
@@ -201,17 +201,16 @@ module HackerNewsClient
     def get_json(path)
       url = "#{@base_url}#{path}"
       uri = URI(url)
-      raw = nil
       http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == "https"
+      http.use_ssl = uri.scheme == 'https'
       http.open_timeout = @timeout
       http.read_timeout = @timeout
       begin
         req = Net::HTTP::Get.new(uri.request_uri)
-        req["User-Agent"] = @user_agent
+        req['User-Agent'] = @user_agent
         res = http.request(req)
       rescue Net::OpenTimeout, Net::ReadTimeout
-        raise TimeoutError.new("hn: timeout", url: url)
+        raise TimeoutError.new('hn: timeout', url: url)
       rescue SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH => e
         raise TransportError.new("hn: transport: #{e.message}", url: url)
       end

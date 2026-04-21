@@ -27,6 +27,8 @@ from hacker_news_client import (  # noqa: E402
     Poll,
     PollOpt,
     Story,
+)
+from hacker_news_client import (  # noqa: E402
     TimeoutError as HnTimeoutError,
 )
 

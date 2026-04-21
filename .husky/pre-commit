@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+# Pre-commit gate: run lint-staged on staged files, then a lightweight sanity
+# test. Heavy cross-language verification runs in CI — keep pre-commit fast.
+
+# 1) Staged-file lint/format pass (fast; only touches files you're committing)
+npx lint-staged || exit 1
+
+# 2) Mock-server smoke test (already fast: 19 tests in ~200ms)
+node --test test/*.test.js > /tmp/hn-precommit.log 2>&1 || {
+  echo "pre-commit: mock-server tests failed — see /tmp/hn-precommit.log"
+  exit 1
+}
+
+echo "pre-commit: lint + mock-server smoke ok"

@@ -21,11 +21,11 @@ module HackerNewsClient
     # @param data [Hash{String, Symbol => Object}] decoded API payload.
     def initialize(data)
       h = data.transform_keys(&:to_s)
-      @id = h["id"]
-      @type = h["type"]
-      @by = h["by"]
-      @time = h["time"]
-      @dead = h["dead"] == true
+      @id = h['id']
+      @type = h['type']
+      @by = h['by']
+      @time = h['time']
+      @dead = h['dead'] == true
       assign(h)
     end
 
@@ -34,13 +34,13 @@ module HackerNewsClient
     # @return [Item]
     # @raise [ArgumentError] if the +type+ field is missing or unknown.
     def self.from_hash(data)
-      kind = data["type"] || data[:type]
+      kind = data['type'] || data[:type]
       case kind
-      when "story"   then Story.new(data)
-      when "comment" then Comment.new(data)
-      when "job"     then Job.new(data)
-      when "poll"    then Poll.new(data)
-      when "pollopt" then PollOpt.new(data)
+      when 'story'   then Story.new(data)
+      when 'comment' then Comment.new(data)
+      when 'job'     then Job.new(data)
+      when 'poll'    then Poll.new(data)
+      when 'pollopt' then PollOpt.new(data)
       else raise ArgumentError, "unknown item type: #{kind.inspect}"
       end
     end
@@ -54,12 +54,12 @@ module HackerNewsClient
     attr_reader :title, :score, :descendants, :url, :text, :kids
 
     def assign(h)
-      @title = h["title"]
-      @score = h["score"]
-      @descendants = h["descendants"]
-      @url = h["url"]
-      @text = h["text"]
-      @kids = h["kids"] || []
+      @title = h['title']
+      @score = h['score']
+      @descendants = h['descendants']
+      @url = h['url']
+      @text = h['text']
+      @kids = h['kids'] || []
     end
   end
 
@@ -68,9 +68,9 @@ module HackerNewsClient
     attr_reader :parent, :text, :kids
 
     def assign(h)
-      @parent = h["parent"]
-      @text = h["text"]
-      @kids = h["kids"] || []
+      @parent = h['parent']
+      @text = h['text']
+      @kids = h['kids'] || []
     end
   end
 
@@ -79,10 +79,10 @@ module HackerNewsClient
     attr_reader :title, :score, :url, :text
 
     def assign(h)
-      @title = h["title"]
-      @score = h["score"]
-      @url = h["url"]
-      @text = h["text"]
+      @title = h['title']
+      @score = h['score']
+      @url = h['url']
+      @text = h['text']
     end
   end
 
@@ -91,12 +91,12 @@ module HackerNewsClient
     attr_reader :title, :score, :descendants, :parts, :text, :kids
 
     def assign(h)
-      @title = h["title"]
-      @score = h["score"]
-      @descendants = h["descendants"]
-      @parts = h["parts"] || []
-      @text = h["text"]
-      @kids = h["kids"] || []
+      @title = h['title']
+      @score = h['score']
+      @descendants = h['descendants']
+      @parts = h['parts'] || []
+      @text = h['text']
+      @kids = h['kids'] || []
     end
   end
 
@@ -105,9 +105,9 @@ module HackerNewsClient
     attr_reader :poll, :score, :text
 
     def assign(h)
-      @poll = h["poll"]
-      @score = h["score"]
-      @text = h["text"]
+      @poll = h['poll']
+      @score = h['score']
+      @text = h['text']
     end
   end
 
@@ -119,11 +119,11 @@ module HackerNewsClient
     # @return [User]
     def self.from_hash(h)
       new(
-        id: h["id"],
-        created: h["created"],
-        karma: h["karma"],
-        about: h["about"],
-        submitted: h["submitted"] || []
+        id: h['id'],
+        created: h['created'],
+        karma: h['karma'],
+        about: h['about'],
+        submitted: h['submitted'] || []
       )
     end
   end

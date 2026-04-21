@@ -9,7 +9,7 @@
 module HackerNewsClient
 end
 
-require_relative "hacker_news_client/version"
-require_relative "hacker_news_client/errors"
-require_relative "hacker_news_client/items"
-require_relative "hacker_news_client/client"
+require_relative 'hacker_news_client/version'
+require_relative 'hacker_news_client/errors'
+require_relative 'hacker_news_client/items'
+require_relative 'hacker_news_client/client'
