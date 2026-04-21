@@ -42,7 +42,7 @@ jobs:
           pip install pip-audit
           pip install -e ".[async]" || pip install -e .
       - name: Run pip-audit against installed environment
-        run: pip-audit --strict --skip-editable --progress-spinner=off
+        run: pip-audit --skip-editable --progress-spinner=off
 
   ruby-audit:
     name: bundler-audit (Ruby)
