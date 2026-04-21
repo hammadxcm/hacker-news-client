@@ -1,0 +1,25 @@
+{
+  "name": "hacker-news-client",
+  "version": "0.1.0",
+  "description": "Zero-dependency client for the Hacker News Firebase API.",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "example": "node example.js",
+    "lint": "eslint src test example.js",
+    "format": "prettier -w src test example.js"
+  },
+  "files": [
+    "src/",
+    "README.md"
+  ],
+  "keywords": ["hacker-news", "hackernews", "hn", "api", "client"],
+  "license": "MIT"
+}

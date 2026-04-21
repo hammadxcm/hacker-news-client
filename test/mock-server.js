@@ -49,14 +49,14 @@ async function serveFixture(res, filename) {
 async function handle(req, res) {
   const url = req.url ?? '/';
 
-  if (INJECT_500_RE.test(url)) {
+  if (INJECT_500_RE.test(url) || url.startsWith('/v0/item/inject-500')) {
     res.statusCode = 500;
     res.setHeader('Content-Type', JSON_CT);
     res.end('{"error":"injected 500"}');
     return;
   }
 
-  if (INJECT_SLOW_RE.test(url)) {
+  if (INJECT_SLOW_RE.test(url) || url.startsWith('/v0/item/slow')) {
     await new Promise((r) => setTimeout(r, slowDelayMs()));
     await serveFixture(res, 'item-1.json');
     return;
