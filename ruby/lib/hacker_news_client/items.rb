@@ -19,7 +19,14 @@ module HackerNewsClient
     attr_reader :id, :type, :by, :time, :dead
 
     # @param data [Hash{String, Symbol => Object}] decoded API payload.
+    # @raise [NotImplementedError] if instantiated directly. Always construct
+    #   via +Item.from_hash+ or a concrete subclass (+Story+, +Comment+, etc.).
     def initialize(data)
+      if instance_of?(Item)
+        raise NotImplementedError,
+              'HackerNewsClient::Item is abstract — use Item.from_hash or a concrete subclass'
+      end
+
       h = data.transform_keys(&:to_s)
       @id = h['id']
       @type = h['type']
@@ -131,6 +138,18 @@ module HackerNewsClient
   # The +/updates+ endpoint record.
   Updates = Struct.new(:items, :profiles, keyword_init: true)
 
-  # A comment tree node with recursively-fetched replies.
-  CommentTreeNode = Struct.new(:id, :by, :time, :parent, :text, :dead, :kids, :replies, keyword_init: true)
+  # A comment tree node with recursively-fetched replies. Inherits from
+  # {Comment} so callers can use +is_a?(Comment)+ / pattern matching
+  # uniformly on the whole tree.
+  class CommentTreeNode < Comment
+    # @return [Array<CommentTreeNode>] child replies (already pruned of deleted nodes).
+    attr_reader :replies
+
+    # @param data [Hash] decoded comment payload.
+    # @param replies [Array<CommentTreeNode>]
+    def initialize(data, replies:)
+      super(data)
+      @replies = replies
+    end
+  end
 end

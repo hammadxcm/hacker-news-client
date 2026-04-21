@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -651,5 +652,69 @@ func TestHTTPErrorContextCancelled_Unit(t *testing.T) {
 	_, err := c.Item(ctx, 1)
 	if !errors.Is(err, ErrTimeout) {
 		t.Errorf("expected ErrTimeout, got %v", err)
+	}
+}
+
+// TestCommentTreeDeepChain_NoDeadlock is a regression test for the C1 deadlock.
+// Previous visit() held a semaphore permit across the recursive wg.Wait(),
+// causing any chain longer than Concurrency to hang forever. With the fix,
+// this test completes in milliseconds.
+func TestCommentTreeDeepChain_NoDeadlock_Unit(t *testing.T) {
+	// Build a 15-link linear chain: 1 → 2 → 3 → ... → 15.
+	routes := map[string]http.HandlerFunc{}
+	depth := 15
+	for i := 1; i <= depth; i++ {
+		i := i
+		node := map[string]any{
+			"id":   i,
+			"type": "comment",
+			"time": 1,
+			"text": "node",
+		}
+		if i < depth {
+			node["kids"] = []int{i + 1}
+		}
+		routes[fmt.Sprintf("/item/%d.json", i)] = jsonHandler(node)
+	}
+	base, shutdown := newStubServer(t, routes)
+	defer shutdown()
+
+	// Concurrency = 3, chain depth = 15. Pre-fix: deadlocks forever.
+	c := New(Options{BaseURL: base, Concurrency: 3, Timeout: 2 * time.Second})
+
+	done := make(chan *CommentTreeNode, 1)
+	errCh := make(chan error, 1)
+	go func() {
+		root, err := c.CommentTree(context.Background(), 1)
+		if err != nil {
+			errCh <- err
+			return
+		}
+		done <- root
+	}()
+
+	select {
+	case err := <-errCh:
+		t.Fatalf("unexpected error: %v", err)
+	case root := <-done:
+		// Verify we actually walked the full chain: 15 nodes on the single
+		// spine. Count: root + 14 descendants.
+		count := 0
+		var walk func(n *CommentTreeNode)
+		walk = func(n *CommentTreeNode) {
+			if n == nil {
+				return
+			}
+			count++
+			for _, r := range n.Replies {
+				walk(r)
+			}
+		}
+		walk(root)
+		if count != depth {
+			t.Errorf("expected %d nodes, got %d (deadlock may have masked nodes)", depth, count)
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("CommentTree deadlocked on a 15-deep chain with Concurrency=3")
 	}
 }

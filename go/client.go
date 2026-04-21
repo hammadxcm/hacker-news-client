@@ -59,18 +59,21 @@ type Client struct {
 func New(opts Options) *Client {
 	base := opts.BaseURL
 	if base == "" {
-		base = os.Getenv("HN_BASE")
+		// HN_BASE="" is treated as unset (common in .env files).
+		if env := os.Getenv("HN_BASE"); env != "" {
+			base = env
+		}
 	}
 	if base == "" {
 		base = DefaultBaseURL
 	}
 	base = strings.TrimRight(base, "/")
 	timeout := opts.Timeout
-	if timeout == 0 {
+	if timeout <= 0 {
 		timeout = DefaultTimeout
 	}
 	conc := opts.Concurrency
-	if conc == 0 {
+	if conc <= 0 {
 		conc = DefaultConcurrency
 	}
 	ua := opts.UserAgent
@@ -80,6 +83,12 @@ func New(opts Options) *Client {
 	client := opts.HTTPClient
 	if client == nil {
 		client = &http.Client{Timeout: timeout}
+	}
+	// When the caller injects an HTTPClient, preserve its Timeout field; their
+	// client's timeout is authoritative. c.Timeout then just reflects what's in
+	// effect for debug/introspection.
+	if opts.HTTPClient != nil && client.Timeout > 0 {
+		timeout = client.Timeout
 	}
 	return &Client{BaseURL: base, Timeout: timeout, Concurrency: conc, UserAgent: ua, http: client}
 }
@@ -95,6 +104,14 @@ func (c *Client) rawGET(ctx context.Context, path string) ([]byte, error) {
 	req.Header.Set("User-Agent", c.UserAgent)
 	resp, err := c.http.Do(req)
 	if err != nil {
+		// Caller-initiated cancellation is semantically distinct from a
+		// transport failure. In Items()/CommentTree() fail-fast mode the sibling
+		// goroutines see context.Canceled — that's "cancelled by peer," not
+		// "DNS/TLS/conn broken." Surface it as the context error so callers can
+		// errors.Is(err, context.Canceled).
+		if errors.Is(err, context.Canceled) {
+			return nil, ctx.Err()
+		}
 		var urlErr *url.Error
 		if errors.As(err, &urlErr) && urlErr.Timeout() {
 			return nil, fmt.Errorf("%w at %s", ErrTimeout, u)
@@ -106,9 +123,9 @@ func (c *Client) rawGET(ctx context.Context, path string) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 400 {
-		// drain body to allow connection reuse, ignore error
-		_, _ = io.Copy(io.Discard, resp.Body)
-		return nil, &HTTPError{Status: resp.StatusCode, URL: u}
+		// Capture up to 1 KiB of body for debugging; ignore drain error.
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
+		return nil, &HTTPError{Status: resp.StatusCode, URL: u, Body: string(body)}
 	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
@@ -336,10 +353,14 @@ func (c *Client) JobStories(ctx context.Context, limit int) ([]Item, error) {
 //
 // Returns (nil, nil) if the root itself is deleted or missing.
 func (c *Client) CommentTree(ctx context.Context, id int64) (*CommentTreeNode, error) {
+	conc := c.Concurrency
+	if conc <= 0 {
+		conc = DefaultConcurrency
+	}
 	treeCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	sem := make(chan struct{}, c.Concurrency)
+	sem := make(chan struct{}, conc)
 	var firstErr error
 	var errMu sync.Mutex
 
@@ -352,24 +373,36 @@ func (c *Client) CommentTree(ctx context.Context, id int64) (*CommentTreeNode, e
 		errMu.Unlock()
 	}
 
-	var visit func(nodeID int64) *CommentTreeNode
-	visit = func(nodeID int64) *CommentTreeNode {
+	// fetchNode acquires a permit, fetches + decodes one node, releases the
+	// permit BEFORE returning. This is critical: if the permit were held across
+	// the recursive wg.Wait() below, a tree deeper than Concurrency deadlocks
+	// (every ancestor holds a permit waiting for descendants that can never
+	// acquire one).
+	fetchNode := func(nodeID int64) (raw *struct {
+		ID      int64   `json:"id"`
+		By      string  `json:"by"`
+		Time    int64   `json:"time"`
+		Parent  int64   `json:"parent"`
+		Text    string  `json:"text"`
+		Kids    []int64 `json:"kids"`
+		Dead    bool    `json:"dead"`
+		Type    string  `json:"type"`
+		Deleted bool    `json:"deleted"`
+	}, missing bool, err error) {
 		select {
 		case sem <- struct{}{}:
 			defer func() { <-sem }()
 		case <-treeCtx.Done():
-			return nil
+			return nil, true, treeCtx.Err()
 		}
 		body, err := c.rawGET(treeCtx, fmt.Sprintf("/item/%d.json", nodeID))
 		if err != nil {
-			setErr(err)
-			return nil
+			return nil, false, err
 		}
-		trimmed := trimJSON(body)
-		if string(trimmed) == "null" {
-			return nil
+		if string(trimJSON(body)) == "null" {
+			return nil, true, nil
 		}
-		var raw struct {
+		raw = &struct {
 			ID      int64   `json:"id"`
 			By      string  `json:"by"`
 			Time    int64   `json:"time"`
@@ -379,17 +412,32 @@ func (c *Client) CommentTree(ctx context.Context, id int64) (*CommentTreeNode, e
 			Dead    bool    `json:"dead"`
 			Type    string  `json:"type"`
 			Deleted bool    `json:"deleted"`
-		}
-		if err := json.Unmarshal(body, &raw); err != nil {
-			setErr(fmt.Errorf("%w: %v", ErrDecode, err))
-			return nil
+		}{}
+		if err := json.Unmarshal(body, raw); err != nil {
+			return nil, false, fmt.Errorf("%w: %v", ErrDecode, err)
 		}
 		if raw.Deleted {
+			return nil, true, nil
+		}
+		return raw, false, nil
+	}
+
+	var visit func(nodeID int64) *CommentTreeNode
+	visit = func(nodeID int64) *CommentTreeNode {
+		raw, missing, err := fetchNode(nodeID)
+		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				// Batch was cancelled by a sibling error — don't overwrite the
+				// real first error.
+				return nil
+			}
+			setErr(err)
 			return nil
 		}
-		// Fan-out children in parallel, each calling visit recursively (which
-		// itself acquires the same semaphore). Because visit returns before
-		// its children's fetches enter the semaphore, there's no deadlock.
+		if missing {
+			return nil
+		}
+		// Recurse WITHOUT holding a permit — fetchNode released it on return.
 		replies := make([]*CommentTreeNode, len(raw.Kids))
 		var wg sync.WaitGroup
 		for i, kid := range raw.Kids {

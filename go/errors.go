@@ -17,10 +17,12 @@ var (
 )
 
 // HTTPError is returned when the server responds with a non-2xx status.
-// Callers check with errors.As.
+// Callers check with errors.As. Body carries up to 1 KiB of the response body
+// (may be empty when the body was empty or a network error interrupted drain).
 type HTTPError struct {
 	Status int
 	URL    string
+	Body   string
 }
 
 func (e *HTTPError) Error() string {

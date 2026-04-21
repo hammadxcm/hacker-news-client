@@ -40,9 +40,19 @@ export class HackerNewsClient {
   private readonly _fetch: typeof fetch;
 
   constructor(opts: HackerNewsClientOptions = {}) {
-    this.baseUrl = (opts.baseUrl ?? process.env.HN_BASE ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
-    this.timeout = opts.timeout ?? DEFAULT_TIMEOUT_MS;
-    this.concurrency = opts.concurrency ?? DEFAULT_CONCURRENCY;
+    // HN_BASE="" (empty, common in .env files) is treated as unset.
+    const envBase =
+      typeof process !== 'undefined' && process.env && process.env.HN_BASE
+        ? process.env.HN_BASE
+        : undefined;
+    this.baseUrl = (opts.baseUrl ?? envBase ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
+    // Non-positive timeout/concurrency are replaced with defaults rather
+    // than silently producing hangs (timeout ≤ 0) or empty-batch results
+    // (concurrency ≤ 0).
+    const timeoutIn = opts.timeout ?? DEFAULT_TIMEOUT_MS;
+    const concurrencyIn = opts.concurrency ?? DEFAULT_CONCURRENCY;
+    this.timeout = timeoutIn > 0 ? timeoutIn : DEFAULT_TIMEOUT_MS;
+    this.concurrency = concurrencyIn > 0 ? concurrencyIn : DEFAULT_CONCURRENCY;
     this.userAgent = opts.userAgent ?? DEFAULT_USER_AGENT;
     this._fetch = opts.fetch ?? globalThis.fetch;
   }

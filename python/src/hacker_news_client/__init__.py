@@ -9,9 +9,10 @@ Example:
 from .client import HackerNewsClient
 from .errors import (
     HackerNewsError,
+    HnTimeoutError,
     HttpError,
     JsonError,
-    TimeoutError,
+    TimeoutError,  # back-compat alias; deprecated in favor of HnTimeoutError
     TransportError,
 )
 from .types import (
@@ -33,9 +34,10 @@ __version__ = "0.1.0"
 __all__ = [
     "HackerNewsClient",
     "HackerNewsError",
+    "HnTimeoutError",
     "HttpError",
     "JsonError",
-    "TimeoutError",
+    "TimeoutError",  # deprecated alias; new code should use HnTimeoutError
     "TransportError",
     "Item",
     "Story",

@@ -34,7 +34,11 @@ pub struct Options {
 
 impl Default for Options {
     fn default() -> Self {
-        let base = std::env::var("HN_BASE").unwrap_or_else(|_| DEFAULT_BASE_URL.to_string());
+        // Treat HN_BASE="" (empty string, common in .env files) as unset.
+        let base = std::env::var("HN_BASE")
+            .ok()
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| DEFAULT_BASE_URL.to_string());
         Self {
             base_url: base.trim_end_matches('/').to_string(),
             timeout: DEFAULT_TIMEOUT,
@@ -67,18 +71,33 @@ pub struct HackerNewsClient {
 
 impl HackerNewsClient {
     /// Construct a client with the given options.
+    ///
+    /// Zero or negative-equivalent values for `concurrency` are replaced with
+    /// [`DEFAULT_CONCURRENCY`]. A zero `timeout` is replaced with
+    /// [`DEFAULT_TIMEOUT`] — a literal zero would cause `reqwest` to never
+    /// complete a request, which is never what a caller wants.
     pub fn new(opts: Options) -> Result<Self> {
+        let concurrency = if opts.concurrency == 0 {
+            DEFAULT_CONCURRENCY
+        } else {
+            opts.concurrency
+        };
+        let timeout = if opts.timeout.is_zero() {
+            DEFAULT_TIMEOUT
+        } else {
+            opts.timeout
+        };
         let http = HttpClient::builder()
             .user_agent(&opts.user_agent)
-            .timeout(opts.timeout)
+            .timeout(timeout)
             .redirect(reqwest::redirect::Policy::limited(5))
             .build()?;
         Ok(Self {
             base_url: Arc::from(opts.base_url.trim_end_matches('/').to_string()),
             http,
-            sem: Arc::new(Semaphore::new(opts.concurrency)),
+            sem: Arc::new(Semaphore::new(concurrency)),
             user_agent: Arc::from(opts.user_agent),
-            concurrency: opts.concurrency,
+            concurrency,
         })
     }
 
@@ -150,7 +169,13 @@ impl HackerNewsClient {
             let (i, res) = match joined {
                 Ok(pair) => pair,
                 Err(join_err) if join_err.is_cancelled() => continue,
-                Err(join_err) => panic!("join error: {join_err}"),
+                Err(join_err) => {
+                    if first_err.is_none() {
+                        first_err = Some(Error::Task(join_err.to_string()));
+                        set.abort_all();
+                    }
+                    continue;
+                }
             };
             match res {
                 Ok(item) => results[i] = item,
@@ -280,7 +305,11 @@ impl HackerNewsClient {
         if v.get("deleted") == Some(&serde_json::Value::Bool(true)) {
             return Ok(None);
         }
-        let comment: Comment = serde_json::from_value(v).unwrap_or_default();
+        // Propagate decode errors via Error::Decode rather than silently
+        // substituting Comment::default(). A malformed wire payload would
+        // otherwise surface as an empty zero-id node indistinguishable from
+        // a valid child.
+        let comment: Comment = serde_json::from_value(v)?;
         let kid_ids = comment.kids.clone();
 
         if kid_ids.is_empty() {
@@ -312,7 +341,12 @@ impl HackerNewsClient {
                     }
                 }
                 Err(join_err) if join_err.is_cancelled() => continue,
-                Err(join_err) => panic!("comment_tree task panic: {join_err}"),
+                Err(join_err) => {
+                    if first_err.is_none() {
+                        first_err = Some(Error::Task(join_err.to_string()));
+                        set.abort_all();
+                    }
+                }
             }
         }
         if let Some(e) = first_err {

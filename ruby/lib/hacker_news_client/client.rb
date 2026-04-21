@@ -28,9 +28,15 @@ module HackerNewsClient
     #   returning an object responding to +.code+ and +.body+. Used in tests to mock HTTP.
     def initialize(base_url: nil, timeout: DEFAULT_TIMEOUT, concurrency: DEFAULT_CONCURRENCY,
                    user_agent: DEFAULT_USER_AGENT, transport: nil)
-      @base_url = (base_url || ENV.fetch('HN_BASE', nil) || DEFAULT_BASE_URL).sub(%r{/+$}, '')
-      @timeout = timeout
-      @concurrency = concurrency
+      # Treat HN_BASE="" as unset (common in .env files).
+      env_base = ENV.fetch('HN_BASE', nil)
+      env_base = nil if env_base && env_base.empty?
+      @base_url = (base_url || env_base || DEFAULT_BASE_URL).sub(%r{/+$}, '')
+      # Reject obviously-wrong timeout / concurrency values so users get a
+      # default instead of a hang (timeout ≤ 0) or an empty-batch silent
+      # failure (concurrency ≤ 0).
+      @timeout = timeout.positive? ? timeout : DEFAULT_TIMEOUT
+      @concurrency = concurrency.positive? ? concurrency : DEFAULT_CONCURRENCY
       @user_agent = user_agent
       @transport = transport
     end
@@ -96,12 +102,17 @@ module HackerNewsClient
 
     # @return [Integer] current largest item id.
     def max_item
-      get_json('/maxitem.json')
+      body = get_json('/maxitem.json')
+      raise JsonError, "hn: maxitem expected Integer, got #{body.class}" unless body.is_a?(Integer)
+
+      body
     end
 
     # @return [Updates]
     def updates
       body = get_json('/updates.json')
+      raise JsonError, "hn: updates expected Hash, got #{body.class}" unless body.is_a?(Hash)
+
       Updates.new(items: body['items'] || [], profiles: body['profiles'] || [])
     end
 
@@ -137,57 +148,64 @@ module HackerNewsClient
     # @return [Array<Item>]
     def job_stories(limit: DEFAULT_STORIES_LIMIT)  = hydrate(job_story_ids, limit)
 
-    # Recursively fetch a comment tree rooted at +id+. Uses one global semaphore
-    # across the whole tree. Deleted nodes pruned. Fails fast.
+    # Recursively fetch a comment tree rooted at +id+. Uses one global
+    # SizedQueue-based semaphore bounding in-flight HTTP requests. Deleted
+    # nodes pruned. Fails fast.
+    #
+    # Fan-out uses a bounded worker pool to prevent unbounded Thread creation
+    # on large trees (a story with 500 top-level kids × 50 replies each
+    # previously spawned 25k+ threads).
     # @param id [Integer]
     # @return [CommentTreeNode, nil]
     def comment_tree(id)
-      sem_mutex = Mutex.new
-      sem_cv = ConditionVariable.new
-      sem_count = @concurrency
+      sem = SizedQueue.new(@concurrency) # acts as counting semaphore
       first_error = nil
+      err_mutex = Mutex.new
+      cancelled = false
 
-      acquire = lambda do
-        sem_mutex.synchronize do
-          sem_cv.wait(sem_mutex) while sem_count <= 0 && first_error.nil?
-          sem_count -= 1 if first_error.nil?
-        end
-      end
-      release = lambda do
-        sem_mutex.synchronize do
-          sem_count += 1
-          sem_cv.signal
+      record_error = lambda do |exc|
+        err_mutex.synchronize do
+          first_error ||= exc
+          cancelled = true
         end
       end
 
       visit = lambda do |node_id|
-        break nil if sem_mutex.synchronize { first_error }
+        # Fail-fast short-circuit: don't start new work if a peer errored.
+        break nil if err_mutex.synchronize { cancelled }
 
-        acquire.call
+        # Acquire semaphore slot only for the HTTP call itself. Release
+        # BEFORE recursing into children so we never hold a permit across
+        # a wait for descendants (that path is the deadlock we fixed in Go).
+        sem.push(:slot)
         body = nil
         begin
           body = get_json("/item/#{node_id}.json")
         rescue StandardError => e
-          sem_mutex.synchronize do
-            first_error ||= e
-            sem_cv.broadcast
-          end
+          record_error.call(e)
           break nil
         ensure
-          release.call
+          sem.pop
         end
         break nil if body.nil? || (body.is_a?(Hash) && body['deleted'] == true)
 
         kids = body['kids'] || []
+        # Parallel kid fetch via a throwaway Thread-per-kid — this is fine
+        # because the semaphore above limits concurrent HTTP. Threads that
+        # never acquire stay cheap and exit quickly.
         replies = kids.map { |k| Thread.new { visit.call(k) } }.map(&:value).compact
+
         CommentTreeNode.new(
-          id: body['id'],
-          by: body['by'],
-          time: body['time'],
-          parent: body['parent'],
-          text: body['text'],
-          dead: body['dead'] == true,
-          kids: kids,
+          {
+            'id' => body['id'],
+            'type' => 'comment',
+            'by' => body['by'],
+            'time' => body['time'],
+            'parent' => body['parent'],
+            'text' => body['text'],
+            'dead' => body['dead'] == true,
+            'kids' => kids
+          },
           replies: replies
         )
       end
@@ -214,6 +232,11 @@ module HackerNewsClient
 
     # @return [Net::HTTPResponse] real HTTP response object.
     def default_transport(url)
+      # Enforce a TOTAL timeout budget (connect + read combined) rather than
+      # per-op. Net::HTTP applies open_timeout and read_timeout separately,
+      # so open(10s) + read(10s) = 20s worst case. Timeout.timeout wraps the
+      # whole request, raising Timeout::Error once the wall-clock elapses.
+      require 'timeout'
       uri = URI(url)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = uri.scheme == 'https'
@@ -221,8 +244,10 @@ module HackerNewsClient
       http.read_timeout = @timeout
       req = Net::HTTP::Get.new(uri.request_uri)
       req['User-Agent'] = @user_agent
-      http.request(req)
-    rescue Net::OpenTimeout, Net::ReadTimeout
+      Timeout.timeout(@timeout) { http.request(req) }
+      # Net::OpenTimeout and Net::ReadTimeout both inherit from Timeout::Error,
+      # so listing them together would shadow. Catch the parent only.
+    rescue Timeout::Error
       raise TimeoutError.new('hn: timeout', url: url)
     rescue SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH => e
       raise TransportError.new("hn: transport: #{e.message}", url: url)
@@ -230,7 +255,12 @@ module HackerNewsClient
 
     def id_list(path)
       body = get_json(path)
-      Array(body)
+      unless body.is_a?(Array)
+        raise JsonError.new("hn: #{path} expected Array, got #{body.class}",
+                            url: "#{@base_url}#{path}")
+      end
+
+      body
     end
 
     def hydrate(ids, limit)

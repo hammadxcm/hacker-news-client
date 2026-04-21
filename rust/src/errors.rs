@@ -43,6 +43,12 @@ pub enum Error {
     /// Underlying transport / TLS / connection failure.
     #[error("hn: transport error: {0}")]
     Transport(#[from] reqwest::Error),
+
+    /// A spawned task panicked or was otherwise unable to complete.
+    /// This is distinct from a cancellation (which is handled silently) and
+    /// surfaces bugs in the client itself rather than remote-server problems.
+    #[error("hn: task failure: {0}")]
+    Task(String),
 }
 
 /// Convenient alias matching crate-wide [`Result`](std::result::Result).

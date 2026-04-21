@@ -15,9 +15,9 @@ import threading
 import urllib.error
 import urllib.request
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor, as_completed  # noqa: F401
 
-from .errors import HttpError, JsonError, TimeoutError, TransportError
+from .errors import HnTimeoutError, HttpError, JsonError, TransportError
 from .types import (
     CommentTreeNode,
     Item,
@@ -66,7 +66,16 @@ class HackerNewsClient:
         user_agent: str = DEFAULT_USER_AGENT,
         opener: urllib.request.OpenerDirector | None = None,
     ) -> None:
-        self.base_url = (base_url or os.environ.get("HN_BASE") or DEFAULT_BASE_URL).rstrip("/")
+        env_base = os.environ.get("HN_BASE") or None  # treat "" as unset
+        self.base_url = (base_url or env_base or DEFAULT_BASE_URL).rstrip("/")
+        # Validate numeric options rather than silently substituting defaults
+        # for obviously-wrong values (0, negative). A zero timeout would hang
+        # indefinitely; zero concurrency would fan out 0 workers and return
+        # an empty list for a non-empty batch.
+        if timeout <= 0:
+            timeout = DEFAULT_TIMEOUT_S
+        if concurrency <= 0:
+            concurrency = DEFAULT_CONCURRENCY
         self.timeout = timeout
         self.concurrency = concurrency
         self.user_agent = user_agent
@@ -77,20 +86,34 @@ class HackerNewsClient:
     def _get(self, path: str) -> object:
         url = f"{self.base_url}{path}"
         req = urllib.request.Request(url, headers={"User-Agent": self.user_agent})
+        # Enforce a TOTAL timeout budget (connect + read + decode combined)
+        # rather than per-op. urllib's timeout= applies to each blocking op
+        # individually, so in the worst case connect(10s) + read(10s) =
+        # 20s. A wall-clock Timer closes the response mid-read if exceeded.
+        deadline = threading.Event()
+        timer = threading.Timer(self.timeout, deadline.set)
+        timer.daemon = True
+        timer.start()
         try:
             with self._opener.open(req, timeout=self.timeout) as resp:
                 raw = resp.read()
         except urllib.error.HTTPError as err:
             status = err.code
             err.close()
+            if status is None:
+                raise TransportError("hn: transport (no status)", url=url) from err
             raise HttpError(f"hn: http {status}", url=url, status=status) from err
         except urllib.error.URLError as err:
             reason = getattr(err, "reason", None)
-            if isinstance(reason, (socket.timeout, TimeoutError)):
-                raise TimeoutError("hn: timeout", url=url) from err
+            if isinstance(reason, (socket.timeout, builtins.TimeoutError)):
+                raise HnTimeoutError("hn: timeout", url=url) from err
             raise TransportError("hn: transport failure", url=url) from err
         except builtins.TimeoutError as err:
-            raise TimeoutError("hn: timeout", url=url) from err
+            raise HnTimeoutError("hn: timeout", url=url) from err
+        finally:
+            timer.cancel()
+        if deadline.is_set():
+            raise HnTimeoutError("hn: total timeout exceeded", url=url)
         try:
             return json.loads(raw.decode("utf-8"))
         except (json.JSONDecodeError, UnicodeDecodeError) as err:
@@ -128,16 +151,26 @@ class HackerNewsClient:
         if not ids:
             return []
         results: dict[int, Item | None] = {}
-        first_error: list[BaseException] = []
+        first_error: list[Exception] = []
+        cancel_flag = threading.Event()
         lock = threading.Lock()
 
         def worker(idx: int, item_id: int | str) -> None:
+            # True fail-fast: workers bail early if a peer already errored.
+            # ThreadPoolExecutor.submit queues all tasks immediately, so
+            # without this check every queued worker would run to completion
+            # before the caller sees the error.
+            if cancel_flag.is_set():
+                return
+            # Narrow from BaseException so KeyboardInterrupt / SystemExit
+            # aren't swallowed by the worker thread.
             try:
                 results[idx] = self.item(item_id)
-            except BaseException as exc:  # noqa: BLE001
+            except Exception as exc:
                 with lock:
                     if not first_error:
                         first_error.append(exc)
+                        cancel_flag.set()
 
         with ThreadPoolExecutor(max_workers=self.concurrency) as exe:
             futures = [exe.submit(worker, i, id) for i, id in enumerate(ids)]
@@ -235,6 +268,11 @@ class HackerNewsClient:
             >>> tree = client.comment_tree(8000)
         """
         sem = threading.Semaphore(self.concurrency)
+        # A single, shared executor bounds TOTAL thread creation across the
+        # whole recursion. Previously we created a new ThreadPoolExecutor per
+        # node, producing unbounded thread growth on large trees (a story
+        # with 500 top-level kids, each with 50 replies, spawned 25k+ threads).
+        tree_executor = ThreadPoolExecutor(max_workers=self.concurrency)
 
         def visit(node_id: int | str) -> CommentTreeNode | None:
             with sem:
@@ -246,10 +284,9 @@ class HackerNewsClient:
             kids = body.get("kids", []) or []
             children: list[CommentTreeNode] = []
             if kids:
-                with ThreadPoolExecutor(max_workers=min(self.concurrency, len(kids))) as exe:
-                    for child in exe.map(visit, kids):
-                        if child is not None:
-                            children.append(child)
+                for child in tree_executor.map(visit, kids):
+                    if child is not None:
+                        children.append(child)
             # Best-effort Comment construction regardless of whether this node's
             # `type` is comment/story/etc. — consumers typically only call this
             # for a story root, whose own top-level shape we don't need to
@@ -265,4 +302,7 @@ class HackerNewsClient:
                 dead=bool(body.get("dead", False)),
             )
 
-        return visit(id)
+        try:
+            return visit(id)
+        finally:
+            tree_executor.shutdown(wait=False)

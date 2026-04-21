@@ -104,9 +104,20 @@ export class HackerNewsClient {
    * @param {typeof fetch} [opts.fetch] injectable fetch (test doubles, middleware)
    */
   constructor(opts = {}) {
-    this.baseUrl = (opts.baseUrl ?? process.env.HN_BASE ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
-    this.timeout = opts.timeout ?? DEFAULT_TIMEOUT_MS;
-    this.concurrency = opts.concurrency ?? DEFAULT_CONCURRENCY;
+    // HN_BASE="" (empty string, common in .env files) is treated as unset.
+    const envBase =
+      typeof process !== 'undefined' && process.env && process.env.HN_BASE
+        ? process.env.HN_BASE
+        : undefined;
+    this.baseUrl = (opts.baseUrl ?? envBase ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
+    // Reject non-positive timeout/concurrency rather than silently normalizing —
+    // a zero timeout would never resolve; zero concurrency would return [] for
+    // any non-empty ids batch. Normalize to defaults instead.
+    const timeout = opts.timeout ?? DEFAULT_TIMEOUT_MS;
+    const concurrency = opts.concurrency ?? DEFAULT_CONCURRENCY;
+    this.timeout = typeof timeout === 'number' && timeout > 0 ? timeout : DEFAULT_TIMEOUT_MS;
+    this.concurrency =
+      typeof concurrency === 'number' && concurrency > 0 ? concurrency : DEFAULT_CONCURRENCY;
     this.userAgent = opts.userAgent ?? DEFAULT_USER_AGENT;
     this.fetch = opts.fetch ?? globalThis.fetch;
   }
@@ -174,10 +185,16 @@ export class HackerNewsClient {
     if (ids.length === 0) return [];
     const concurrency = Math.min(this.concurrency, ids.length);
     const results = new Array(ids.length);
-    const batchCtrl = new AbortController();
     let cursor = 0;
     let firstError = null;
 
+    // Each worker checks `firstError` before dequeuing the next id. Once a
+    // peer has captured an error, remaining workers skip their next fetch.
+    // Requests ALREADY in-flight still resolve (fetch() takes no signal here),
+    // which is acceptable — the visible behavior to the caller is "raised
+    // after the first error." Wiring an AbortController through would cancel
+    // the in-flight sockets but is a larger refactor; deferred to v0.2 if
+    // latency under pathological failure modes becomes a concern.
     const worker = async () => {
       while (true) {
         if (firstError) return;
@@ -186,10 +203,7 @@ export class HackerNewsClient {
         try {
           results[i] = await this.item(ids[i]);
         } catch (err) {
-          if (!firstError) {
-            firstError = err;
-            batchCtrl.abort(err);
-          }
+          if (!firstError) firstError = err;
           return;
         }
       }
