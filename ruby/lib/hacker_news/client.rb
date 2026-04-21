@@ -4,13 +4,13 @@ require 'json'
 require 'net/http'
 require 'uri'
 
-module HackerNewsClient
+module HackerNews
   # Client for the Hacker News Firebase API.
   #
   # @example
-  #   client = HackerNewsClient::Client.new
+  #   client = HackerNews::Client.new
   #   item = client.item(1)
-  #   puts item.title if item.is_a?(HackerNewsClient::Story)
+  #   puts item.title if item.is_a?(HackerNews::Story)
   class Client
     DEFAULT_BASE_URL = 'https://hacker-news.firebaseio.com/v0'
     DEFAULT_TIMEOUT = 10.0
@@ -44,7 +44,7 @@ module HackerNewsClient
     # Fetch a single item.
     # @param id [Integer]
     # @return [Item, nil] +nil+ for unknown ids and deleted stubs.
-    # @raise [HackerNewsClient::Error] on HTTP / transport / decode failure.
+    # @raise [HackerNews::Error] on HTTP / transport / decode failure.
     def item(id)
       body = get_json("/item/#{id}.json")
       return nil if body.nil?

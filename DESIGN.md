@@ -261,7 +261,7 @@ The mock server is the specification's reference implementation. If a library te
 | npm (JS) | `hacker-news-client` |
 | npm (TS) | `@hacker-news/client-ts` |
 | PyPI | `hacker-news-client` (dist) / `hacker_news_client` (import) |
-| RubyGems | `hacker_news_client` |
+| RubyGems | `hacker_news` |
 | crates.io | `hacker-news-client` |
 | Go module | `github.com/<user>/hacker-news-client/go` (monorepo submodule) |
 

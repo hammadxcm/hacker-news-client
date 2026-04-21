@@ -22,7 +22,7 @@ done
 sed -i.bak -E "s/^version = \".*\"/version = \"$NEW\"/" "$ROOT/python/pyproject.toml" && rm "$ROOT/python/pyproject.toml.bak"
 
 # Ruby
-sed -i.bak -E "s/VERSION = \".*\"/VERSION = \"$NEW\"/" "$ROOT/ruby/lib/hacker_news_client/version.rb" && rm "$ROOT/ruby/lib/hacker_news_client/version.rb.bak"
+sed -i.bak -E "s/VERSION = \".*\"/VERSION = \"$NEW\"/" "$ROOT/ruby/lib/hacker_news/version.rb" && rm "$ROOT/ruby/lib/hacker_news/version.rb.bak"
 
 # Rust
 sed -i.bak -E "s/^version = \".*\"/version = \"$NEW\"/" "$ROOT/rust/Cargo.toml" && rm "$ROOT/rust/Cargo.toml.bak"

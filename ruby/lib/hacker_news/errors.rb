@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module HackerNewsClient
+module HackerNews
   # Base error class. Every exception the client raises is a subclass of this.
   #
   # @!attribute [r] url

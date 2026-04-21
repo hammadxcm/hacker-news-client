@@ -158,15 +158,15 @@ More: [`python/README.md`](./python/README.md)
 <summary><b>Ruby (3.1+)</b></summary>
 
 ```bash
-gem install hacker_news_client
+gem install hacker_news
 ```
 
 ```ruby
-require 'hacker_news_client'
+require 'hacker_news'
 
-client = HackerNewsClient::Client.new
+client = HackerNews::Client.new
 item = client.item(1)
-puts item.title if item.is_a?(HackerNewsClient::Story)
+puts item.title if item.is_a?(HackerNews::Story)
 ```
 
 More: [`ruby/README.md`](./ruby/README.md)

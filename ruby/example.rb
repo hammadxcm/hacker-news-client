@@ -6,11 +6,11 @@
 # Run: ruby example.rb
 
 $LOAD_PATH.unshift File.expand_path('lib', __dir__)
-require 'hacker_news_client'
+require 'hacker_news'
 
-client = HackerNewsClient::Client.new
+client = HackerNews::Client.new
 client.top_stories(limit: 5).each do |item|
-  next unless item.is_a?(HackerNewsClient::Story)
+  next unless item.is_a?(HackerNews::Story)
 
   puts "• #{item.title} — #{item.by} (#{item.score} points)"
 end

@@ -161,7 +161,7 @@ Use `item()` as the reference template. For a new method `foo()`:
    - `js/src/client.js`
    - `ts/src/client.ts`
    - `python/src/hacker_news_client/client.py`
-   - `ruby/lib/hacker_news_client/client.rb`
+   - `ruby/lib/hacker_news/client.rb`
    - `go/client.go`
    - `rust/src/client.rs`
 5. **Add integration tests** against the mock server for each language (`test/test_client.*`).

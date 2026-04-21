@@ -253,11 +253,11 @@ Sampled ~12 community clients across npm, PyPI, RubyGems, pkg.go.dev, crates.io.
 
 ### Ruby (3.1+)
 
-- **Naming**: `snake_case` methods, class per item variant (`HackerNews::Story < HackerNews::Item`), gem `hacker_news_client`.
+- **Naming**: `snake_case` methods, class per item variant (`HackerNews::Story < HackerNews::Item`), gem `hacker_news`.
 - **Errors**: `HackerNews::Error < StandardError` with subclasses; raised, never returned.
 - **Concurrency**: stdlib threads + `SizedQueue` for bounded fan-out. Avoid Async gem (runtime dep).
 - **HTTP**: stdlib `Net::HTTP` via an injectable transport.
-- **Packaging**: `hacker_news_client.gemspec`, `lib/hacker_news_client.rb`, `lib/hacker_news_client/version.rb`, `Rakefile`, `required_ruby_version >= 3.1`.
+- **Packaging**: `hacker_news.gemspec`, `lib/hacker_news.rb`, `lib/hacker_news/version.rb`, `Rakefile`, `required_ruby_version >= 3.1`.
 - **Testing**: `minitest` (stdlib).
 - **Null**: `nil` for absent; `Deleted` not modeled as a variant (collapse to `nil` per spec).
 
@@ -322,6 +322,6 @@ Live payloads captured 2026-04-21. These seed `test/fixtures/*.json` so all six 
 ## 6. Versioning & Release
 
 - Single `VERSION` file at repo root, initially `0.1.0`.
-- `scripts/bump-version.sh` propagates into each manifest: `js/package.json`, `ts/package.json`, `python/pyproject.toml`, `ruby/lib/hacker_news_client/version.rb`, `go/version.go`, `rust/Cargo.toml`.
+- `scripts/bump-version.sh` propagates into each manifest: `js/package.json`, `ts/package.json`, `python/pyproject.toml`, `ruby/lib/hacker_news/version.rb`, `go/version.go`, `rust/Cargo.toml`.
 - Lockstep across all six libraries. 1.0 cut only after `scripts/verify.sh` passes all six.
 - Pre-1.0: any design change allowed; API not yet stable.

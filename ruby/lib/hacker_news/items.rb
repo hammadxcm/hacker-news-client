@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
-module HackerNewsClient
+module HackerNews
   # Sum-type root class. Concrete subclasses: Story, Comment, Job, Poll, PollOpt.
   # Use +from_hash+ to build the right subclass from a decoded API payload.
   #
   # @example
-  #   item = HackerNewsClient::Item.from_hash(api_payload)
+  #   item = HackerNews::Item.from_hash(api_payload)
   #   case item
-  #   when HackerNewsClient::Story then item.title
-  #   when HackerNewsClient::Comment then item.text
+  #   when HackerNews::Story then item.title
+  #   when HackerNews::Comment then item.text
   #   end
   class Item
     # Common fields on every variant.
@@ -24,7 +24,7 @@ module HackerNewsClient
     def initialize(data)
       if instance_of?(Item)
         raise NotImplementedError,
-              'HackerNewsClient::Item is abstract — use Item.from_hash or a concrete subclass'
+              'HackerNews::Item is abstract — use Item.from_hash or a concrete subclass'
       end
 
       h = data.transform_keys(&:to_s)

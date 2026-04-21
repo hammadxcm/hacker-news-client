@@ -49,7 +49,7 @@ Every library has the same four concerns, laid out in the language's idiomatic s
 | Types | `types.ts` / JSDoc | `types.py` | `items.rb` | `items.go` | `items.rs` |
 | Errors | `errors.js` / `errors.ts` | `errors.py` | `errors.rb` | `errors.go` | `errors.rs` |
 | Transport + client | `client.js` / `client.ts` | `client.py` | `client.rb` | `client.go` | `client.rs` |
-| Public entry | `index.js` / `index.ts` | `__init__.py` | `hacker_news_client.rb` | (package root) | `lib.rs` |
+| Public entry | `index.js` / `index.ts` | `__init__.py` | `hacker_news.rb` | (package root) | `lib.rs` |
 
 ### Why these four?
 

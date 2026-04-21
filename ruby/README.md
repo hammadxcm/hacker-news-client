@@ -1,6 +1,6 @@
-# hacker_news_client (Ruby)
+# hacker_news (Ruby)
 
-[![Gem version](https://img.shields.io/gem/v/hacker_news_client.svg?style=flat-square&logo=rubygems&logoColor=white)](https://rubygems.org/gems/hacker_news_client)
+[![Gem version](https://img.shields.io/gem/v/hacker_news.svg?style=flat-square&logo=rubygems&logoColor=white)](https://rubygems.org/gems/hacker_news)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](../LICENSE)
 [![Ruby](https://img.shields.io/badge/ruby-%E2%89%A53.1-CC342D?style=flat-square&logo=ruby&logoColor=white)](https://www.ruby-lang.org)
 [![Coverage](https://img.shields.io/badge/line--coverage-100%25-brightgreen.svg?style=flat-square)](#tests)
@@ -10,30 +10,30 @@ Zero-dependency Ruby gem for the [Hacker News Firebase API](https://github.com/H
 ## Install
 
 ```bash
-gem install hacker_news_client
+gem install hacker_news
 ```
 
 Or add to your `Gemfile`:
 
 ```ruby
-gem 'hacker_news_client', '~> 0.1.0'
+gem 'hacker_news', '~> 0.1.0'
 ```
 
 ## Usage
 
 ```ruby
-require 'hacker_news_client'
+require 'hacker_news'
 
-client = HackerNewsClient::Client.new
+client = HackerNews::Client.new
 
 # Single item
 item = client.item(1)
-puts item.title if item.is_a?(HackerNewsClient::Story)
+puts item.title if item.is_a?(HackerNews::Story)
 
 # Case on variant (Ruby 3.0+ pattern matching)
 case item
-in HackerNewsClient::Story(title:, score:)  then puts "#{title} (#{score})"
-in HackerNewsClient::Comment(text:, parent:) then puts "comment on #{parent}"
+in HackerNews::Story(title:, score:)  then puts "#{title} (#{score})"
+in HackerNews::Comment(text:, parent:) then puts "comment on #{parent}"
 in nil                                       then puts 'deleted or missing'
 end
 
@@ -53,7 +53,7 @@ user = client.user('pg')
 ## Configuration
 
 ```ruby
-HackerNewsClient::Client.new(
+HackerNews::Client.new(
   base_url: 'https://hacker-news.firebaseio.com/v0',   # default
   timeout: 10.0,                                         # seconds
   concurrency: 10,                                       # batch fan-out cap
@@ -69,15 +69,15 @@ The `transport:` lambda is the injection point for mocking — see [`test/test_u
 ```ruby
 begin
   client.item(1)
-rescue HackerNewsClient::HttpError => err
+rescue HackerNews::HttpError => err
   warn "HTTP #{err.status} at #{err.url}"
-rescue HackerNewsClient::TimeoutError
+rescue HackerNews::TimeoutError
   warn 'timed out'
-rescue HackerNewsClient::TransportError => err
+rescue HackerNews::TransportError => err
   warn "network: #{err.message}"
-rescue HackerNewsClient::JsonError
+rescue HackerNews::JsonError
   warn 'invalid JSON'
-rescue HackerNewsClient::Error => err
+rescue HackerNews::Error => err
   warn err.message
 end
 ```
@@ -87,15 +87,15 @@ end
 ## Item variants
 
 ```ruby
-HackerNewsClient::Item          # abstract base
-  ├─ HackerNewsClient::Story    # title, score, descendants, url, text, kids
-  ├─ HackerNewsClient::Comment  # parent, text, kids
-  ├─ HackerNewsClient::Job      # title, score, url, text
-  ├─ HackerNewsClient::Poll     # title, score, descendants, parts, text, kids
-  └─ HackerNewsClient::PollOpt  # poll, score, text
+HackerNews::Item          # abstract base
+  ├─ HackerNews::Story    # title, score, descendants, url, text, kids
+  ├─ HackerNews::Comment  # parent, text, kids
+  ├─ HackerNews::Job      # title, score, url, text
+  ├─ HackerNews::Poll     # title, score, descendants, parts, text, kids
+  └─ HackerNews::PollOpt  # poll, score, text
 ```
 
-`HackerNewsClient::Item.from_hash(h)` builds the matching subclass from a decoded payload.
+`HackerNews::Item.from_hash(h)` builds the matching subclass from a decoded payload.
 
 ## Full API
 
