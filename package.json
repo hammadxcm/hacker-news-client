@@ -15,7 +15,7 @@
     "lint:js": "eslint js/src js/test js/example.js --config js/eslint.config.js",
     "lint:ts": "eslint ts/src ts/test ts/example.ts --config ts/eslint.config.js",
     "lint:py": "ruff check python/src python/tests",
-    "lint:ruby": "cd ruby && rubocop",
+    "lint:ruby": "cd ruby && bundle exec rubocop",
     "lint:go": "cd go && go vet ./... && test -z \"$(gofmt -l .)\"",
     "lint:rust": "cd rust && cargo clippy --all-targets -- -D warnings && cargo fmt --check",
     "coverage": "npm run coverage:js && npm run coverage:ts && npm run coverage:py && npm run coverage:go && npm run coverage:ruby && npm run coverage:rust",

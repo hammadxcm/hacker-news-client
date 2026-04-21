@@ -56,7 +56,7 @@ jobs:
           bundler-cache: true
       - name: Install bundler-audit
         run: gem install bundler-audit
-      - name: Ensure Gemfile.lock exists (library policy: not committed)
+      - name: "Ensure Gemfile.lock exists (library policy: not committed)"
         working-directory: ruby
         run: bundle install
       - name: Run bundler-audit
@@ -89,7 +89,7 @@ jobs:
           workspaces: rust -> target
       - name: Install cargo-audit
         run: cargo install cargo-audit --locked
-      - name: Generate lockfile (library policy: not committed)
+      - name: "Generate lockfile (library policy: not committed)"
         working-directory: rust
         run: cargo generate-lockfile
       - name: Run cargo-audit
