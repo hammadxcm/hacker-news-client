@@ -114,18 +114,12 @@ export class HackerNewsClient {
   /**
    * Low-level GET that returns decoded JSON or throws a typed error.
    * @param {string} path e.g. `/item/1.json`
-   * @param {AbortSignal} [externalSignal] external fail-fast signal from a batch
    * @returns {Promise<unknown>}
    */
-  async #get(path, externalSignal) {
+  async #get(path) {
     const url = `${this.baseUrl}${path}`;
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(new TimeoutError({ url })), this.timeout);
-    const onExternalAbort = () => ctrl.abort(externalSignal?.reason);
-    if (externalSignal) {
-      if (externalSignal.aborted) ctrl.abort(externalSignal.reason);
-      else externalSignal.addEventListener('abort', onExternalAbort, { once: true });
-    }
     try {
       let res;
       try {
@@ -150,7 +144,6 @@ export class HackerNewsClient {
       }
     } finally {
       clearTimeout(timer);
-      externalSignal?.removeEventListener('abort', onExternalAbort);
     }
   }
 

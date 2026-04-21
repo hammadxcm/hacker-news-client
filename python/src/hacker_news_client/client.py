@@ -132,8 +132,6 @@ class HackerNewsClient:
         lock = threading.Lock()
 
         def worker(idx: int, item_id: int | str) -> None:
-            if first_error:
-                return
             try:
                 results[idx] = self.item(item_id)
             except BaseException as exc:  # noqa: BLE001

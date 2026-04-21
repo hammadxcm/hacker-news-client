@@ -9,7 +9,11 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
+# Coverage output
+coverage/
+
 # Python
+.coverage
 __pycache__/
 *.pyc
 *.pyo

@@ -24,12 +24,15 @@ module HackerNewsClient
     # @param timeout [Numeric] per-request budget in seconds.
     # @param concurrency [Integer] batch fan-out cap.
     # @param user_agent [String]
+    # @param transport [#call, nil] optional callable +transport.call(url, timeout, user_agent)+
+    #   returning an object responding to +.code+ and +.body+. Used in tests to mock HTTP.
     def initialize(base_url: nil, timeout: DEFAULT_TIMEOUT, concurrency: DEFAULT_CONCURRENCY,
-                   user_agent: DEFAULT_USER_AGENT)
-      @base_url = (base_url || ENV['HN_BASE'] || DEFAULT_BASE_URL).sub(%r{/+$}, '')
+                   user_agent: DEFAULT_USER_AGENT, transport: nil)
+      @base_url = (base_url || ENV.fetch('HN_BASE', nil) || DEFAULT_BASE_URL).sub(%r{/+$}, '')
       @timeout = timeout
       @concurrency = concurrency
       @user_agent = user_agent
+      @transport = transport
     end
 
     # Fetch a single item.
@@ -197,30 +200,32 @@ module HackerNewsClient
 
     private
 
-    # @return [Object] decoded JSON (can be Hash / Array / Numeric / String / NilClass).
+    # @return [Object] decoded JSON (Hash / Array / Numeric / String / NilClass).
     def get_json(path)
       url = "#{@base_url}#{path}"
+      res = @transport ? @transport.call(url, @timeout, @user_agent) : default_transport(url)
+      code = res.code.to_i
+      raise HttpError.new("hn: http #{code}", url: url, status: code) if code >= 400
+
+      JSON.parse(res.body)
+    rescue JSON::ParserError => e
+      raise JsonError.new("hn: invalid json: #{e.message}", url: url)
+    end
+
+    # @return [Net::HTTPResponse] real HTTP response object.
+    def default_transport(url)
       uri = URI(url)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = uri.scheme == 'https'
       http.open_timeout = @timeout
       http.read_timeout = @timeout
-      begin
-        req = Net::HTTP::Get.new(uri.request_uri)
-        req['User-Agent'] = @user_agent
-        res = http.request(req)
-      rescue Net::OpenTimeout, Net::ReadTimeout
-        raise TimeoutError.new('hn: timeout', url: url)
-      rescue SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH => e
-        raise TransportError.new("hn: transport: #{e.message}", url: url)
-      end
-      code = res.code.to_i
-      raise HttpError.new("hn: http #{code}", url: url, status: code) if code >= 400
-
-      raw = res.body
-      JSON.parse(raw)
-    rescue JSON::ParserError => e
-      raise JsonError.new("hn: invalid json: #{e.message}", url: url)
+      req = Net::HTTP::Get.new(uri.request_uri)
+      req['User-Agent'] = @user_agent
+      http.request(req)
+    rescue Net::OpenTimeout, Net::ReadTimeout
+      raise TimeoutError.new('hn: timeout', url: url)
+    rescue SocketError, Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH => e
+      raise TransportError.new("hn: transport: #{e.message}", url: url)
     end
 
     def id_list(path)

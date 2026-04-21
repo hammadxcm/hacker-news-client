@@ -11,7 +11,6 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -142,7 +141,8 @@ func (c *Client) Items(ctx context.Context, ids []int64) ([]Item, error) {
 	defer cancel()
 
 	results := make([]Item, len(ids))
-	var firstErr atomic.Value // error
+	var firstErr error
+	var errMu sync.Mutex
 	sem := make(chan struct{}, c.Concurrency)
 	var wg sync.WaitGroup
 
@@ -157,22 +157,25 @@ func (c *Client) Items(ctx context.Context, ids []int64) ([]Item, error) {
 			case <-batchCtx.Done():
 				return
 			}
-			if firstErr.Load() != nil {
-				return
-			}
 			it, err := c.Item(batchCtx, id)
 			if err != nil {
-				if firstErr.CompareAndSwap(nil, err) {
+				errMu.Lock()
+				if firstErr == nil {
+					firstErr = err
 					cancel()
 				}
+				errMu.Unlock()
 				return
 			}
 			results[i] = it
 		}()
 	}
 	wg.Wait()
-	if v := firstErr.Load(); v != nil {
-		return nil, v.(error)
+	errMu.Lock()
+	err := firstErr
+	errMu.Unlock()
+	if err != nil {
+		return nil, err
 	}
 	// Drop nils, preserve order.
 	out := make([]Item, 0, len(results))
@@ -337,7 +340,17 @@ func (c *Client) CommentTree(ctx context.Context, id int64) (*CommentTreeNode, e
 	defer cancel()
 
 	sem := make(chan struct{}, c.Concurrency)
-	var firstErr atomic.Value
+	var firstErr error
+	var errMu sync.Mutex
+
+	setErr := func(err error) {
+		errMu.Lock()
+		if firstErr == nil {
+			firstErr = err
+			cancel()
+		}
+		errMu.Unlock()
+	}
 
 	var visit func(nodeID int64) *CommentTreeNode
 	visit = func(nodeID int64) *CommentTreeNode {
@@ -347,14 +360,9 @@ func (c *Client) CommentTree(ctx context.Context, id int64) (*CommentTreeNode, e
 		case <-treeCtx.Done():
 			return nil
 		}
-		if firstErr.Load() != nil {
-			return nil
-		}
 		body, err := c.rawGET(treeCtx, fmt.Sprintf("/item/%d.json", nodeID))
 		if err != nil {
-			if firstErr.CompareAndSwap(nil, err) {
-				cancel()
-			}
+			setErr(err)
 			return nil
 		}
 		trimmed := trimJSON(body)
@@ -373,9 +381,7 @@ func (c *Client) CommentTree(ctx context.Context, id int64) (*CommentTreeNode, e
 			Deleted bool    `json:"deleted"`
 		}
 		if err := json.Unmarshal(body, &raw); err != nil {
-			if firstErr.CompareAndSwap(nil, fmt.Errorf("%w: %v", ErrDecode, err)) {
-				cancel()
-			}
+			setErr(fmt.Errorf("%w: %v", ErrDecode, err))
 			return nil
 		}
 		if raw.Deleted {
@@ -412,8 +418,11 @@ func (c *Client) CommentTree(ctx context.Context, id int64) (*CommentTreeNode, e
 	}
 
 	root := visit(id)
-	if v := firstErr.Load(); v != nil {
-		return nil, v.(error)
+	errMu.Lock()
+	err := firstErr
+	errMu.Unlock()
+	if err != nil {
+		return nil, err
 	}
 	return root, nil
 }

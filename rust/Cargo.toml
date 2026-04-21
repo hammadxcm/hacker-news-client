@@ -17,6 +17,7 @@ async-recursion = "1"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }
+mockito = "1.5"
 
 [[example]]
 name = "example"

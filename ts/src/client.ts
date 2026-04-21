@@ -56,24 +56,13 @@ export class HackerNewsClient {
     this._fetch = opts.fetch ?? globalThis.fetch;
   }
 
-  private async get(
-    path: string,
-    externalSignal?: AbortSignal,
-  ): Promise<unknown> {
+  private async get(path: string): Promise<unknown> {
     const url = `${this.baseUrl}${path}`;
     const ctrl = new AbortController();
     const timer = setTimeout(
       () => ctrl.abort(new TimeoutError({ url })),
       this.timeout,
     );
-    const onExternalAbort = (): void => ctrl.abort(externalSignal?.reason);
-    if (externalSignal) {
-      if (externalSignal.aborted) ctrl.abort(externalSignal.reason);
-      else
-        externalSignal.addEventListener("abort", onExternalAbort, {
-          once: true,
-        });
-    }
     try {
       let res: Response;
       try {
@@ -99,7 +88,6 @@ export class HackerNewsClient {
       }
     } finally {
       clearTimeout(timer);
-      externalSignal?.removeEventListener("abort", onExternalAbort);
     }
   }
 
