@@ -24,6 +24,7 @@ uv.lock
 
 # Ruby
 .bundle/
+.ruby-lsp/
 vendor/
 Gemfile.lock
 
