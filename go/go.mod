@@ -1,3 +1,3 @@
-module github.com/hammadkhan/hacker-news-client/go
+module github.com/hammadxcm/hacker-news-client/go
 
 go 1.22

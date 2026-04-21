@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for proposing a feature. For open-ended design discussions, consider starting with a [Discussion](https://github.com/hammadkhan/hacker-news-client/discussions/categories/ideas) — we can move it to an issue once the design is more concrete.
+        Thanks for proposing a feature. For open-ended design discussions, consider starting with a [Discussion](https://github.com/hammadxcm/hacker-news-client/discussions/categories/ideas) — we can move it to an issue once the design is more concrete.
 
   - type: dropdown
     id: language
@@ -65,7 +65,7 @@ body:
       label: Implementation notes
       description: |
         If you're thinking about implementing this yourself, outline how you'd
-        approach it. Review [`DESIGN.md`](https://github.com/hammadkhan/hacker-news-client/blob/main/DESIGN.md) first — the contract is load-bearing.
+        approach it. Review [`DESIGN.md`](https://github.com/hammadxcm/hacker-news-client/blob/main/DESIGN.md) first — the contract is load-bearing.
 
   - type: checkboxes
     id: checklist

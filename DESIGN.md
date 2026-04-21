@@ -229,7 +229,7 @@ The mock server is the specification's reference implementation. If a library te
 ## 9. Directory Contract
 
 ```
-/Users/hammadkhan/hacker-news-client/
+/Users/hammadxcm/hacker-news-client/
 ├── RESEARCH.md / DESIGN.md / README.md / LICENSE / VERSION
 ├── .gitignore / .editorconfig
 ├── docs/superpowers/plans/            ← per-subsystem TDD plans

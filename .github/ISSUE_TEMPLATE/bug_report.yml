@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for taking the time to file a bug report. Please fill out every field — incomplete reports slow us down.
 
-        If this is a security vulnerability, please do **not** file a public issue. Use [GitHub Security Advisories](https://github.com/hammadkhan/hacker-news-client/security/advisories/new) instead.
+        If this is a security vulnerability, please do **not** file a public issue. Use [GitHub Security Advisories](https://github.com/hammadxcm/hacker-news-client/security/advisories/new) instead.
 
   - type: dropdown
     id: language

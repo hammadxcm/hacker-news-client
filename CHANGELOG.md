@@ -114,5 +114,5 @@ Uniform across all six languages with language-idiomatic surfaces:
 - Retry, rate-limiting, caching middleware.
 - Release automation and registry publishing.
 
-[Unreleased]: https://github.com/hammadkhan/hacker-news-client/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/hammadkhan/hacker-news-client/releases/tag/v0.1.0
+[Unreleased]: https://github.com/hammadxcm/hacker-news-client/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/hammadxcm/hacker-news-client/releases/tag/v0.1.0

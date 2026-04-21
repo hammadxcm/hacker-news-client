@@ -60,7 +60,7 @@ appointed representative at an online or offline event.
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
 reported to the community leaders responsible for enforcement via
-[GitHub Security Advisories](https://github.com/hammadkhan/hacker-news-client/security/advisories/new),
+[GitHub Security Advisories](https://github.com/hammadxcm/hacker-news-client/security/advisories/new),
 which supports private, confidential reporting.
 
 All complaints will be reviewed and investigated promptly and fairly.

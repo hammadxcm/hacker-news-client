@@ -8,20 +8,20 @@ This is a six-language client suite for the
 
 | I want to... | Go here |
 |---|---|
-| Ask "how do I do X with this library?" | [GitHub Discussions — Q&A](https://github.com/hammadkhan/hacker-news-client/discussions/categories/q-a) |
-| Propose a new feature or discuss design | [GitHub Discussions — Ideas](https://github.com/hammadkhan/hacker-news-client/discussions/categories/ideas) |
-| Share what you built with the library | [GitHub Discussions — Show and tell](https://github.com/hammadkhan/hacker-news-client/discussions/categories/show-and-tell) |
-| Report a reproducible bug | [File a bug report](https://github.com/hammadkhan/hacker-news-client/issues/new?template=bug_report.yml) |
-| Request a feature | [File a feature request](https://github.com/hammadkhan/hacker-news-client/issues/new?template=feature_request.yml) |
-| Report a security vulnerability | [File a private advisory](https://github.com/hammadkhan/hacker-news-client/security/advisories/new) — see [SECURITY.md](./SECURITY.md) |
+| Ask "how do I do X with this library?" | [GitHub Discussions — Q&A](https://github.com/hammadxcm/hacker-news-client/discussions/categories/q-a) |
+| Propose a new feature or discuss design | [GitHub Discussions — Ideas](https://github.com/hammadxcm/hacker-news-client/discussions/categories/ideas) |
+| Share what you built with the library | [GitHub Discussions — Show and tell](https://github.com/hammadxcm/hacker-news-client/discussions/categories/show-and-tell) |
+| Report a reproducible bug | [File a bug report](https://github.com/hammadxcm/hacker-news-client/issues/new?template=bug_report.yml) |
+| Request a feature | [File a feature request](https://github.com/hammadxcm/hacker-news-client/issues/new?template=feature_request.yml) |
+| Report a security vulnerability | [File a private advisory](https://github.com/hammadxcm/hacker-news-client/security/advisories/new) — see [SECURITY.md](./SECURITY.md) |
 | Contribute code or docs | [CONTRIBUTING.md](./CONTRIBUTING.md) |
 
 ## Before asking
 
 1. **Search first.** Someone may have already asked or answered:
-   - [Discussions](https://github.com/hammadkhan/hacker-news-client/discussions)
-   - [Open issues](https://github.com/hammadkhan/hacker-news-client/issues)
-   - [Closed issues](https://github.com/hammadkhan/hacker-news-client/issues?q=is%3Aissue+is%3Aclosed)
+   - [Discussions](https://github.com/hammadxcm/hacker-news-client/discussions)
+   - [Open issues](https://github.com/hammadxcm/hacker-news-client/issues)
+   - [Closed issues](https://github.com/hammadxcm/hacker-news-client/issues?q=is%3Aissue+is%3Aclosed)
 2. **Read the language's README.** The per-language landing pages answer the
    most common questions:
    - [`js/README.md`](./js/README.md)

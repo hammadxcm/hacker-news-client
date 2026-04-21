@@ -10,9 +10,9 @@ A production-quality client suite for the official [Hacker News Firebase API](ht
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](./LICENSE)
 [![Version](https://img.shields.io/badge/version-0.1.0-green.svg?style=flat-square)](./CHANGELOG.md)
-[![CI](https://img.shields.io/github/actions/workflow/status/hammadkhan/hacker-news-client/ci.yml?branch=main&style=flat-square&label=ci&logo=githubactions&logoColor=white)](https://github.com/hammadkhan/hacker-news-client/actions/workflows/ci.yml)
-[![Lint](https://img.shields.io/github/actions/workflow/status/hammadkhan/hacker-news-client/lint.yml?branch=main&style=flat-square&label=lint&logo=eslint&logoColor=white)](https://github.com/hammadkhan/hacker-news-client/actions/workflows/lint.yml)
-[![CodeQL](https://img.shields.io/github/actions/workflow/status/hammadkhan/hacker-news-client/codeql.yml?branch=main&style=flat-square&label=codeql&logo=github)](https://github.com/hammadkhan/hacker-news-client/actions/workflows/codeql.yml)
+[![CI](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/ci.yml?branch=main&style=flat-square&label=ci&logo=githubactions&logoColor=white)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/ci.yml)
+[![Lint](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/lint.yml?branch=main&style=flat-square&label=lint&logo=eslint&logoColor=white)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/lint.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/hammadxcm/hacker-news-client/codeql.yml?branch=main&style=flat-square&label=codeql&logo=github)](https://github.com/hammadxcm/hacker-news-client/actions/workflows/codeql.yml)
 [![Tests](https://img.shields.io/badge/tests-248%20passing-brightgreen.svg?style=flat-square&logo=pytest&logoColor=white)](./scripts/verify.sh)
 [![Coverage](https://img.shields.io/badge/coverage-~100%25-brightgreen.svg?style=flat-square)](#coverage)
 [![Conventional Commits](https://img.shields.io/badge/Conventional_Commits-1.0.0-FE5196.svg?style=flat-square&logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/)
@@ -175,14 +175,14 @@ More: [`ruby/README.md`](./ruby/README.md)
 <summary><b>Go (1.22+)</b></summary>
 
 ```bash
-go get github.com/hammadkhan/hacker-news-client/go
+go get github.com/hammadxcm/hacker-news-client/go
 ```
 
 ```go
 import (
     "context"
     "fmt"
-    hackernews "github.com/hammadkhan/hacker-news-client/go"
+    hackernews "github.com/hammadxcm/hacker-news-client/go"
 )
 
 c := hackernews.New(hackernews.Options{})
@@ -336,14 +336,14 @@ By participating in this project you agree to abide by our [Code of Conduct](./C
 
 ## Security
 
-If you've found a vulnerability, please **do not** open a public issue. Report privately via [GitHub Security Advisories](https://github.com/hammadkhan/hacker-news-client/security/advisories/new). Full policy: [SECURITY.md](./SECURITY.md).
+If you've found a vulnerability, please **do not** open a public issue. Report privately via [GitHub Security Advisories](https://github.com/hammadxcm/hacker-news-client/security/advisories/new). Full policy: [SECURITY.md](./SECURITY.md).
 
 <hr>
 
 ## Community
 
-- **Discussions** — [GitHub Discussions](https://github.com/hammadkhan/hacker-news-client/discussions) for questions and ideas.
-- **Issues** — [GitHub Issues](https://github.com/hammadkhan/hacker-news-client/issues) for bugs and feature requests.
+- **Discussions** — [GitHub Discussions](https://github.com/hammadxcm/hacker-news-client/discussions) for questions and ideas.
+- **Issues** — [GitHub Issues](https://github.com/hammadxcm/hacker-news-client/issues) for bugs and feature requests.
 - **Code of Conduct** — [Contributor Covenant 2.1](./CODE_OF_CONDUCT.md).
 - **Support** — see [SUPPORT.md](./SUPPORT.md) for the full guide to where-to-ask.
 

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	hackernews "github.com/hammadkhan/hacker-news-client/go"
+	hackernews "github.com/hammadxcm/hacker-news-client/go"
 )
 
 func main() {

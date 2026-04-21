@@ -18,7 +18,7 @@ security fixes. Versions in lockstep across all six language libraries:
 **Please do not open a public GitHub issue for a suspected vulnerability.**
 
 Report privately via
-**[GitHub Security Advisories](https://github.com/hammadkhan/hacker-news-client/security/advisories/new)**.
+**[GitHub Security Advisories](https://github.com/hammadxcm/hacker-news-client/security/advisories/new)**.
 This creates a confidential advisory that only the maintainers and the
 reporter can see until a fix is ready.
 

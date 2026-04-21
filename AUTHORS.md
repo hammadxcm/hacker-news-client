@@ -4,7 +4,7 @@
 
 ## Lead maintainer
 
-- [**hammadkhan**](https://github.com/hammadkhan) — project initiator and
+- [**hammadxcm**](https://github.com/hammadxcm) — project initiator and
   maintainer.
 
 ## Contributors
@@ -16,7 +16,7 @@ git shortlog --summary --numbered --email --no-merges
 ```
 
 See the full contributor graph:
-[https://github.com/hammadkhan/hacker-news-client/graphs/contributors](https://github.com/hammadkhan/hacker-news-client/graphs/contributors).
+[https://github.com/hammadxcm/hacker-news-client/graphs/contributors](https://github.com/hammadxcm/hacker-news-client/graphs/contributors).
 
 ## Acknowledgements
 

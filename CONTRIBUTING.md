@@ -21,7 +21,7 @@ By participating you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.m
 
 ## Before you start
 
-- Search existing [issues](https://github.com/hammadkhan/hacker-news-client/issues) and [discussions](https://github.com/hammadkhan/hacker-news-client/discussions) to avoid duplicate work.
+- Search existing [issues](https://github.com/hammadxcm/hacker-news-client/issues) and [discussions](https://github.com/hammadxcm/hacker-news-client/discussions) to avoid duplicate work.
 - For non-trivial changes, open a discussion or issue first to align on approach — saves wasted work on both sides.
 - Read [`DESIGN.md`](./DESIGN.md) and [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md). The contract is load-bearing: every library must implement it identically.
 
@@ -51,7 +51,7 @@ macOS/Linux are well-supported. Windows users should use WSL2 for the shell scri
 ### First-time clone
 
 ```bash
-git clone https://github.com/hammadkhan/hacker-news-client.git
+git clone https://github.com/hammadxcm/hacker-news-client.git
 cd hacker-news-client
 npm install          # installs husky + eslint + prettier + c8 at the root
 npm test             # runs scripts/verify.sh end-to-end across all 6 languages
@@ -208,7 +208,7 @@ Maintainer-only. Reserved for v1.0+:
 
 ## Reporting security issues
 
-**Please do not open public issues for security vulnerabilities.** Use [GitHub Security Advisories](https://github.com/hammadkhan/hacker-news-client/security/advisories/new) for private disclosure. Full policy: [`SECURITY.md`](./SECURITY.md).
+**Please do not open public issues for security vulnerabilities.** Use [GitHub Security Advisories](https://github.com/hammadxcm/hacker-news-client/security/advisories/new) for private disclosure. Full policy: [`SECURITY.md`](./SECURITY.md).
 
 ## Maintainer notes
 

@@ -1,6 +1,6 @@
 # hacker-news-client/go
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/hammadkhan/hacker-news-client/go.svg)](https://pkg.go.dev/github.com/hammadkhan/hacker-news-client/go)
+[![Go Reference](https://pkg.go.dev/badge/github.com/hammadxcm/hacker-news-client/go.svg)](https://pkg.go.dev/github.com/hammadxcm/hacker-news-client/go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](../LICENSE)
 [![Go](https://img.shields.io/badge/go-%E2%89%A51.22-00ADD8?style=flat-square&logo=go&logoColor=white)](https://go.dev)
 [![Coverage](https://img.shields.io/badge/coverage-98.3%25-brightgreen.svg?style=flat-square)](#tests)
@@ -10,7 +10,7 @@ Zero-dependency Go client for the [Hacker News Firebase API](https://github.com/
 ## Install
 
 ```bash
-go get github.com/hammadkhan/hacker-news-client/go
+go get github.com/hammadxcm/hacker-news-client/go
 ```
 
 ## Usage
@@ -23,7 +23,7 @@ import (
     "fmt"
     "log"
 
-    hackernews "github.com/hammadkhan/hacker-news-client/go"
+    hackernews "github.com/hammadxcm/hacker-news-client/go"
 )
 
 func main() {
