@@ -46,7 +46,9 @@ fn options_default_derives_from_hn_base_env() {
 fn options_default_no_env_falls_back() {
     let _guard = EnvGuard::unset("HN_BASE");
     let opts = Options::default();
-    assert!(opts.base_url.starts_with("https://hacker-news.firebaseio.com/v0"));
+    assert!(opts
+        .base_url
+        .starts_with("https://hacker-news.firebaseio.com/v0"));
 }
 
 #[test]
@@ -64,37 +66,30 @@ fn client_new_succeeds() {
 
 #[test]
 fn item_deserialize_each_variant() {
-    let story: Item =
-        serde_json::from_str(STORY_1_JSON).expect("story deserialize");
+    let story: Item = serde_json::from_str(STORY_1_JSON).expect("story deserialize");
     assert!(matches!(story, Item::Story(_)));
     assert_eq!(story.id(), 1);
     assert_eq!(story.kind(), "story");
 
-    let comment: Item = serde_json::from_str(
-        r#"{"type":"comment","id":2,"time":1,"text":"hi","parent":1}"#,
-    )
-    .unwrap();
+    let comment: Item =
+        serde_json::from_str(r#"{"type":"comment","id":2,"time":1,"text":"hi","parent":1}"#)
+            .unwrap();
     assert!(matches!(comment, Item::Comment(_)));
     assert_eq!(comment.kind(), "comment");
 
-    let job: Item = serde_json::from_str(
-        r#"{"type":"job","id":3,"time":1,"title":"t","score":1}"#,
-    )
-    .unwrap();
+    let job: Item =
+        serde_json::from_str(r#"{"type":"job","id":3,"time":1,"title":"t","score":1}"#).unwrap();
     assert!(matches!(job, Item::Job(_)));
     assert_eq!(job.kind(), "job");
 
-    let poll: Item = serde_json::from_str(
-        r#"{"type":"poll","id":4,"time":1,"score":1,"parts":[10,11]}"#,
-    )
-    .unwrap();
+    let poll: Item =
+        serde_json::from_str(r#"{"type":"poll","id":4,"time":1,"score":1,"parts":[10,11]}"#)
+            .unwrap();
     assert!(matches!(poll, Item::Poll(_)));
     assert_eq!(poll.kind(), "poll");
 
-    let pollopt: Item = serde_json::from_str(
-        r#"{"type":"pollopt","id":5,"time":1,"poll":4,"score":1}"#,
-    )
-    .unwrap();
+    let pollopt: Item =
+        serde_json::from_str(r#"{"type":"pollopt","id":5,"time":1,"poll":4,"score":1}"#).unwrap();
     assert!(matches!(pollopt, Item::PollOpt(_)));
     assert_eq!(pollopt.kind(), "pollopt");
 }
@@ -412,7 +407,11 @@ async fn all_story_id_lists_and_hydration() {
         server
             .mock("GET", path)
             .with_status(200)
-            .with_body(if path == "/topstories.json" { "[1]" } else { "[]" })
+            .with_body(if path == "/topstories.json" {
+                "[1]"
+            } else {
+                "[]"
+            })
             .create_async()
             .await;
     }

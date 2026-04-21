@@ -8,6 +8,7 @@ export default [
       sourceType: 'module',
       globals: {
         fetch: 'readonly',
+        Response: 'readonly',
         AbortController: 'readonly',
         AbortSignal: 'readonly',
         setTimeout: 'readonly',

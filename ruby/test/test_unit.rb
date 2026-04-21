@@ -31,7 +31,7 @@ FakeResponse = Struct.new(:code, :body)
 #   Exception                       → raises
 #   ->(url, timeout, ua) { ... }    → called directly
 def fake_transport(routes)
-  ->(url, timeout, ua) {
+  lambda { |url, timeout, ua|
     spec = routes.fetch(url) { raise "no route for #{url}" }
     case spec
     when Exception then raise spec
@@ -42,8 +42,8 @@ def fake_transport(routes)
       else
         FakeResponse.new('200', spec.to_json)
       end
-    when String    then FakeResponse.new('200', spec)
-    else                FakeResponse.new('200', spec.to_json)
+    when String then FakeResponse.new('200', spec)
+    else FakeResponse.new('200', spec.to_json)
     end
   }
 end
@@ -199,7 +199,7 @@ class BatchAndHydrateTests < Minitest::Test
     calls = 0
     c = HackerNewsClient::Client.new(
       base_url: BASE,
-      transport: ->(_url, _t, _ua) {
+      transport: lambda { |_url, _t, _ua|
         calls += 1
         FakeResponse.new('200', 'null')
       }
@@ -253,12 +253,12 @@ class BatchAndHydrateTests < Minitest::Test
       transport: fake_transport(
         "#{BASE}/maxitem.json" => 123,
         "#{BASE}/updates.json" => { 'items' => [1], 'profiles' => ['pg'] },
-        "#{BASE}/topstories.json"  => [1],
-        "#{BASE}/newstories.json"  => [1],
+        "#{BASE}/topstories.json" => [1],
+        "#{BASE}/newstories.json" => [1],
         "#{BASE}/beststories.json" => [],
-        "#{BASE}/askstories.json"  => [],
+        "#{BASE}/askstories.json" => [],
         "#{BASE}/showstories.json" => [],
-        "#{BASE}/jobstories.json"  => [],
+        "#{BASE}/jobstories.json" => [],
         "#{BASE}/item/1.json" => STORY_1
       )
     )
@@ -316,7 +316,7 @@ class CommentTreeTests < Minitest::Test
   def test_semaphore_contention_concurrency_one
     # Single-permit semaphore + multiple kids forces acquire to wait — exercises
     # the ConditionVariable#wait branch inside comment_tree's acquire lambda.
-    slow_transport = ->(url, _t, _ua) {
+    slow_transport = lambda { |url, _t, _ua|
       sleep 0.01 if url.end_with?('/item/101.json') || url.end_with?('/item/102.json')
       case url
       when "#{BASE}/item/100.json"
@@ -340,7 +340,7 @@ class CommentTreeTests < Minitest::Test
     # others are still pending.
     calls = 0
     mu = Mutex.new
-    t = ->(url, _timeout, _ua) {
+    t = lambda { |url, _timeout, _ua|
       mu.synchronize { calls += 1 }
       if url.end_with?('/item/100.json')
         FakeResponse.new('200',

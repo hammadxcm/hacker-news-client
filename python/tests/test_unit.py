@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import io
 import json
-import socket
 import sys
 import time
 import unittest
@@ -152,7 +151,13 @@ class ItemDecodeTests(unittest.TestCase):
                     "text": "hi",
                     "parent": 0,
                 },
-                f"{BASE}/item/2.json": {"id": 2, "type": "job", "time": 1, "title": "x", "score": 1},
+                f"{BASE}/item/2.json": {
+                    "id": 2,
+                    "type": "job",
+                    "time": 1,
+                    "title": "x",
+                    "score": 1,
+                },
                 f"{BASE}/item/3.json": {
                     "id": 3,
                     "type": "poll",
@@ -160,7 +165,13 @@ class ItemDecodeTests(unittest.TestCase):
                     "score": 1,
                     "parts": [10, 11],
                 },
-                f"{BASE}/item/4.json": {"id": 4, "type": "pollopt", "time": 1, "poll": 3, "score": 1},
+                f"{BASE}/item/4.json": {
+                    "id": 4,
+                    "type": "pollopt",
+                    "time": 1,
+                    "poll": 3,
+                    "score": 1,
+                },
             }
         )
         c = HackerNewsClient(base_url=BASE, opener=opener)
@@ -222,7 +233,7 @@ class ErrorMappingTests(unittest.TestCase):
         self.assertEqual(ctx.exception.status, 404)
 
     def test_timeout_via_socket(self) -> None:
-        c = self._client_raising(socket.timeout("timed out"))
+        c = self._client_raising(TimeoutError("timed out"))
         with self.assertRaises(HnTimeoutError):
             c.item(1)
 
@@ -232,7 +243,7 @@ class ErrorMappingTests(unittest.TestCase):
             c.item(1)
 
     def test_timeout_via_urlerror_wrapping_socket_timeout(self) -> None:
-        c = self._client_raising(urllib.error.URLError(socket.timeout("t")))
+        c = self._client_raising(urllib.error.URLError(TimeoutError("t")))
         with self.assertRaises(HnTimeoutError):
             c.item(1)
 
@@ -314,7 +325,6 @@ class BatchAndHydrateTests(unittest.TestCase):
         c = HackerNewsClient(base_url=BASE, opener=opener, concurrency=2)
         with self.assertRaises(HttpError):
             c.items([1, 99, 2])
-
 
     def test_scalars_and_every_list_plus_hydration(self) -> None:
         routes: dict[str, object] = {
