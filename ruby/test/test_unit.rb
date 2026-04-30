@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Pure unit tests — mocks HackerNews's transport; no network, no
+# Pure unit tests — mocks Hacker::News::Client's transport; no network, no
 # subprocess. Validates decode / error-mapping / concurrency logic.
 
 # SimpleCov must be required BEFORE the library for coverage instrumentation.
@@ -18,7 +18,7 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 require 'minitest/autorun'
 require 'json'
-require 'hacker_news'
+require 'hacker/news/client'
 
 # FakeResponse: minimal stand-in for a Net::HTTPResponse.
 FakeResponse = Struct.new(:code, :body)
@@ -58,22 +58,22 @@ BASE = 'http://mock/v0'
 
 class ConstructorTests < Minitest::Test
   def test_defaults
-    c = HackerNews::Client.new
+    c = Hacker::News::Client.new
     assert c.base_url.start_with?('https://hacker-news.firebaseio.com/v0')
-    assert_equal HackerNews::Client::DEFAULT_TIMEOUT, c.timeout
-    assert_equal HackerNews::Client::DEFAULT_CONCURRENCY, c.concurrency
+    assert_equal Hacker::News::Client::DEFAULT_TIMEOUT, c.timeout
+    assert_equal Hacker::News::Client::DEFAULT_CONCURRENCY, c.concurrency
     assert c.user_agent.start_with?('hn-client-ruby/')
   end
 
   def test_strips_trailing_slash
-    c = HackerNews::Client.new(base_url: 'http://x/v0///')
+    c = Hacker::News::Client.new(base_url: 'http://x/v0///')
     assert_equal 'http://x/v0', c.base_url
   end
 
   def test_hn_base_env
     prev = ENV.fetch('HN_BASE', nil)
     ENV['HN_BASE'] = 'http://env.test/v0'
-    c = HackerNews::Client.new
+    c = Hacker::News::Client.new
     assert_equal 'http://env.test/v0', c.base_url
   ensure
     prev.nil? ? ENV.delete('HN_BASE') : (ENV['HN_BASE'] = prev)
@@ -82,7 +82,7 @@ end
 
 class ItemDecodeTests < Minitest::Test
   def setup
-    @client = HackerNews::Client.new(
+    @client = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport(
         "#{BASE}/item/1.json" => STORY_1,
@@ -100,14 +100,14 @@ class ItemDecodeTests < Minitest::Test
   end
 
   def test_story
-    assert_kind_of HackerNews::Story, @client.item(1)
+    assert_kind_of Hacker::News::Story, @client.item(1)
   end
 
   def test_every_variant
-    assert_kind_of HackerNews::Comment, @client.item(2)
-    assert_kind_of HackerNews::Job,     @client.item(3)
-    assert_kind_of HackerNews::Poll,    @client.item(4)
-    assert_kind_of HackerNews::PollOpt, @client.item(5)
+    assert_kind_of Hacker::News::Comment, @client.item(2)
+    assert_kind_of Hacker::News::Job,     @client.item(3)
+    assert_kind_of Hacker::News::Poll,    @client.item(4)
+    assert_kind_of Hacker::News::PollOpt, @client.item(5)
   end
 
   def test_null_body_returns_nil
@@ -120,70 +120,70 @@ class ItemDecodeTests < Minitest::Test
 
   def test_unknown_type_raises_argument_error
     assert_raises(ArgumentError) do
-      HackerNews::Item.from_hash('type' => 'future', 'id' => 1)
+      Hacker::News::Item.from_hash('type' => 'future', 'id' => 1)
     end
   end
 end
 
 class ErrorMappingTests < Minitest::Test
   def test_http_error
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport("#{BASE}/item/1.json" => 500)
     )
-    err = assert_raises(HackerNews::HttpError) { c.item(1) }
+    err = assert_raises(Hacker::News::HttpError) { c.item(1) }
     assert_equal 500, err.status
     assert_equal "#{BASE}/item/1.json", err.url
   end
 
   def test_http_404_not_conflated
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport("#{BASE}/item/1.json" => 404)
     )
-    err = assert_raises(HackerNews::HttpError) { c.item(1) }
+    err = assert_raises(Hacker::News::HttpError) { c.item(1) }
     assert_equal 404, err.status
   end
 
   def test_json_error
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport("#{BASE}/item/1.json" => 'not-json')
     )
-    assert_raises(HackerNews::JsonError) { c.item(1) }
+    assert_raises(Hacker::News::JsonError) { c.item(1) }
   end
 
   def test_timeout_error
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport(
-        "#{BASE}/item/1.json" => HackerNews::TimeoutError.new('hn: timeout', url: 'x')
+        "#{BASE}/item/1.json" => Hacker::News::TimeoutError.new('hn: timeout', url: 'x')
       )
     )
-    assert_raises(HackerNews::TimeoutError) { c.item(1) }
+    assert_raises(Hacker::News::TimeoutError) { c.item(1) }
   end
 
   def test_transport_error
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport(
-        "#{BASE}/item/1.json" => HackerNews::TransportError.new('hn: down', url: 'x')
+        "#{BASE}/item/1.json" => Hacker::News::TransportError.new('hn: down', url: 'x')
       )
     )
-    assert_raises(HackerNews::TransportError) { c.item(1) }
+    assert_raises(Hacker::News::TransportError) { c.item(1) }
   end
 
   def test_default_transport_connection_refused
     # Point at a closed port to exercise the default Net::HTTP transport + its
     # rescue paths (TransportError on ECONNREFUSED).
-    c = HackerNews::Client.new(base_url: 'http://127.0.0.1:1/v0', timeout: 0.5)
-    assert_raises(HackerNews::TransportError) { c.item(1) }
+    c = Hacker::News::Client.new(base_url: 'http://127.0.0.1:1/v0', timeout: 0.5)
+    assert_raises(Hacker::News::TransportError) { c.item(1) }
   end
 end
 
 class BatchAndHydrateTests < Minitest::Test
   def test_items_order_and_null_drop
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE, concurrency: 3,
       transport: fake_transport(
         "#{BASE}/item/1.json" => STORY_1,
@@ -197,7 +197,7 @@ class BatchAndHydrateTests < Minitest::Test
 
   def test_items_empty
     calls = 0
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: lambda { |_url, _t, _ua|
         calls += 1
@@ -209,7 +209,7 @@ class BatchAndHydrateTests < Minitest::Test
   end
 
   def test_items_fail_fast
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE, concurrency: 2,
       transport: fake_transport(
         "#{BASE}/item/1.json" => STORY_1,
@@ -218,11 +218,11 @@ class BatchAndHydrateTests < Minitest::Test
         "#{BASE}/item/3.json" => STORY_1
       )
     )
-    assert_raises(HackerNews::HttpError) { c.items([1, 99, 2, 3]) }
+    assert_raises(Hacker::News::HttpError) { c.items([1, 99, 2, 3]) }
   end
 
   def test_user_known_and_unknown
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport(
         "#{BASE}/user/pg.json" => { 'id' => 'pg', 'created' => 1, 'karma' => 100,
@@ -237,7 +237,7 @@ class BatchAndHydrateTests < Minitest::Test
   end
 
   def test_user_without_submitted_field
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport(
         "#{BASE}/user/foo.json" => { 'id' => 'foo', 'created' => 1, 'karma' => 0 }
@@ -248,7 +248,7 @@ class BatchAndHydrateTests < Minitest::Test
   end
 
   def test_scalars_and_all_story_lists_plus_hydration
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport(
         "#{BASE}/maxitem.json" => 123,
@@ -280,7 +280,7 @@ end
 
 class CommentTreeTests < Minitest::Test
   def test_prunes_deleted_and_null
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE, concurrency: 2,
       transport: fake_transport(
         "#{BASE}/item/100.json" => {
@@ -298,7 +298,7 @@ class CommentTreeTests < Minitest::Test
   end
 
   def test_null_root_returns_nil
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport("#{BASE}/item/999.json" => nil)
     )
@@ -306,11 +306,11 @@ class CommentTreeTests < Minitest::Test
   end
 
   def test_error_during_tree_fetch_propagates
-    c = HackerNews::Client.new(
+    c = Hacker::News::Client.new(
       base_url: BASE,
       transport: fake_transport("#{BASE}/item/1.json" => 500)
     )
-    assert_raises(HackerNews::HttpError) { c.comment_tree(1) }
+    assert_raises(Hacker::News::HttpError) { c.comment_tree(1) }
   end
 
   def test_semaphore_contention_concurrency_one
@@ -330,7 +330,7 @@ class CommentTreeTests < Minitest::Test
         FakeResponse.new('404', '{}')
       end
     }
-    c = HackerNews::Client.new(base_url: BASE, concurrency: 1, transport: slow_transport)
+    c = Hacker::News::Client.new(base_url: BASE, concurrency: 1, transport: slow_transport)
     root = c.comment_tree(100)
     assert_equal [101, 102], root.replies.map(&:id)
   end
@@ -358,7 +358,7 @@ class CommentTreeTests < Minitest::Test
                            'time' => 1 }.to_json)
       end
     }
-    c = HackerNews::Client.new(base_url: BASE, concurrency: 4, transport: t)
-    assert_raises(HackerNews::HttpError) { c.comment_tree(100) }
+    c = Hacker::News::Client.new(base_url: BASE, concurrency: 4, transport: t)
+    assert_raises(Hacker::News::HttpError) { c.comment_tree(100) }
   end
 end

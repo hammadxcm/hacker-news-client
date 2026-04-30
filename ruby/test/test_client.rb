@@ -4,7 +4,7 @@ $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
 require 'minitest/autorun'
 require 'open-uri'
-require 'hacker_news'
+require 'hacker/news/client'
 
 REPO_ROOT = File.expand_path('../..', __dir__)
 
@@ -48,21 +48,21 @@ class ClientTest < Minitest::Test
 
   def setup
     self.class.startup
-    @client = HackerNews::Client.new(base_url: @@base)
+    @client = Hacker::News::Client.new(base_url: @@base)
   end
 
   def test_item_story
     item = @client.item(1)
-    assert_kind_of HackerNews::Story, item
+    assert_kind_of Hacker::News::Story, item
     assert_equal 'pg', item.by
     assert_equal 'Y Combinator', item.title
   end
 
   def test_item_variants
-    assert_kind_of HackerNews::Comment, @client.item(8001)
-    assert_kind_of HackerNews::Job,     @client.item(192_327)
-    assert_kind_of HackerNews::Poll,    @client.item(126_809)
-    assert_kind_of HackerNews::PollOpt, @client.item(126_810)
+    assert_kind_of Hacker::News::Comment, @client.item(8001)
+    assert_kind_of Hacker::News::Job,     @client.item(192_327)
+    assert_kind_of Hacker::News::Poll,    @client.item(126_809)
+    assert_kind_of Hacker::News::PollOpt, @client.item(126_810)
   end
 
   def test_item_null
@@ -85,7 +85,7 @@ class ClientTest < Minitest::Test
   end
 
   def test_items_fail_fast
-    assert_raises(HackerNews::HttpError) do
+    assert_raises(Hacker::News::HttpError) do
       @client.items([1, 99_999_999, 8001])
     end
   end
@@ -126,16 +126,16 @@ class ClientTest < Minitest::Test
   end
 
   def test_http_500
-    assert_raises(HackerNews::HttpError) { @client.item(99_999_999) }
+    assert_raises(Hacker::News::HttpError) { @client.item(99_999_999) }
   end
 
   def test_timeout
-    fast = HackerNews::Client.new(base_url: @@base, timeout: 0.03)
-    assert_raises(HackerNews::TimeoutError) { fast.item(99_999_998) }
+    fast = Hacker::News::Client.new(base_url: @@base, timeout: 0.03)
+    assert_raises(Hacker::News::TimeoutError) { fast.item(99_999_998) }
   end
 
   def test_unknown_path_404
-    err = assert_raises(HackerNews::HttpError) do
+    err = assert_raises(Hacker::News::HttpError) do
       @client.user('../nonexistent-endpoint')
     end
     assert_equal 404, err.status

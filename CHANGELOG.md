@@ -13,22 +13,41 @@ library in this repository simultaneously.
 
 ### Changed (Ruby — BREAKING for pre-release consumers)
 
-- **Ruby gem renamed `hacker_news_client` → `hacker_news`** and module renamed
-  `HackerNewsClient` → `HackerNews`. Callsite goes from
-  `HackerNewsClient::Client.new` → `HackerNews::Client.new`, aligning with
-  industry-idiomatic Ruby gems (Faraday::Connection, Stripe::Customer,
-  Aws::S3::Client). Eliminates the "Client" duplication.
-  - Renamed files: `ruby/lib/hacker_news_client.rb` → `ruby/lib/hacker_news.rb`;
-    directory `ruby/lib/hacker_news_client/` → `ruby/lib/hacker_news/`;
-    gemspec `hacker_news_client.gemspec` → `hacker_news.gemspec`.
-  - All sub-classes re-namespaced under `HackerNews::` — Story, Comment, Job,
-    Poll, PollOpt, User, Updates, CommentTreeNode, Error (+ HttpError,
+- **Ruby gem renamed `hacker_news` → `hacker-news-client`** and module renamed
+  `HackerNews` → `Hacker::News`. Callsite goes from
+  `HackerNews::Client.new` → `Hacker::News::Client.new`. The dashed gem name
+  matches the suite's other clients (Python `hacker-news-client`, Rust
+  `hacker-news-client`) and follows the strict bundle-gem convention (dashes
+  in gem name → slashes in file path → `::` in module path). The taken-on-
+  RubyGems `hacker_news` (different author, last published 2011) is now
+  avoided.
+  - Renamed files: `ruby/lib/hacker_news.rb` + `ruby/lib/hacker_news/{client,
+    version,errors,items}.rb` → `ruby/lib/hacker/news/{client,version,errors,
+    items}.rb`; gemspec `hacker_news.gemspec` → `hacker-news-client.gemspec`.
+  - Added `ruby/lib/hacker-news-client.rb` shim so `gem 'hacker-news-client'`
+    works with Bundler's default-require (which looks for the literal
+    dashed filename).
+  - All sub-classes re-namespaced under `Hacker::News::` — Story, Comment,
+    Job, Poll, PollOpt, User, Updates, CommentTreeNode, Error (+ HttpError,
     JsonError, TimeoutError, TransportError), VERSION.
-  - `scripts/bump-version.sh` updated to write into `ruby/lib/hacker_news/version.rb`.
+  - User-facing entry require: `require 'hacker_news'` →
+    `require 'hacker/news/client'`.
+  - `scripts/bump-version.sh` updated to write into `ruby/lib/hacker/news/version.rb`.
+  - `.rubocop.yml` excludes `lib/hacker-news-client.rb` from `Naming/FileName`
+    (the dashed name is mandatory for Bundler auto-require).
+  - `Gemfile.lock` updated.
   - Docs updated: ruby/README.md (including shields.io + rubygems.org badge
-    URLs), root README.md Ruby quick-start, DESIGN.md §9, RESEARCH.md §4 + §6,
-    CONTRIBUTING.md "adding a method" file list, docs/ARCHITECTURE.md table.
+    URLs), root README.md Ruby quick-start, DESIGN.md §6 + §9, RESEARCH.md
+    §4 + §6, CONTRIBUTING.md "adding a method" file list,
+    docs/ARCHITECTURE.md table.
   - Gem was unpublished at v0.1.0; no backward-compat alias was added.
+
+### Changed (Ruby — BREAKING for pre-release consumers, prior history)
+
+- **Ruby gem renamed `hacker_news_client` → `hacker_news`** and module renamed
+  `HackerNewsClient` → `HackerNews`. Callsite went from
+  `HackerNewsClient::Client.new` → `HackerNews::Client.new`. (Superseded by
+  the rename above to `hacker-news-client` / `Hacker::News`.)
 
 ### Changed
 
@@ -116,7 +135,7 @@ verification harness.
   - **TypeScript**: literal-tag discriminated union.
   - **Rust**: serde-tagged enum with explicit `rename = "pollopt"`.
   - **Python**: `@dataclass(frozen=True)` per variant with `Item: TypeAlias`.
-  - **Ruby**: class-per-variant under `HackerNews::Item` with `from_hash`.
+  - **Ruby**: class-per-variant under `Hacker::News::Item` with `from_hash`.
   - **Go**: sealed `Item` interface with custom `UnmarshalJSON` dispatcher.
   - **JavaScript**: plain objects with JSDoc `@typedef` union.
 

@@ -37,3 +37,9 @@ Security/Open:
 # the block param convention in the contexts we use.
 Style/ItAssignment:
   Enabled: false
+
+# The `lib/hacker-news-client.rb` shim's dashed name is mandatory — Bundler's
+# default-require for `gem "hacker-news-client"` looks for that exact path.
+Naming/FileName:
+  Exclude:
+    - "lib/hacker-news-client.rb"

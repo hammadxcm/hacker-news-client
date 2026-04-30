@@ -118,20 +118,22 @@ Callers use `match item: case Story(...):`.
 **Ruby**
 
 ```ruby
-module HackerNews
-  class Item
-    def self.from_hash(h)
-      case h[:type]
-      when "story"   then Story.new(h)
-      when "comment" then Comment.new(h)
-      when "job"     then Job.new(h)
-      when "poll"    then Poll.new(h)
-      when "pollopt" then PollOpt.new(h)
+module Hacker
+  module News
+    class Item
+      def self.from_hash(h)
+        case h[:type]
+        when "story"   then Story.new(h)
+        when "comment" then Comment.new(h)
+        when "job"     then Job.new(h)
+        when "poll"    then Poll.new(h)
+        when "pollopt" then PollOpt.new(h)
+        end
       end
     end
+    class Story < Item; end
+    # ...
   end
-  class Story < Item; end
-  # ...
 end
 ```
 
@@ -167,7 +169,7 @@ One error class / enum per language carrying `status` (nullable when not an HTTP
 | Language | Surface |
 |---|---|
 | JS / TS | `class HackerNewsError extends Error { status?; url; cause? }` + subclasses `TimeoutError`, `HttpError`, `JsonError`, `TransportError` |
-| Ruby | `HackerNews::Error < StandardError` + `HackerNews::TimeoutError`, `HackerNews::HttpError`, `HackerNews::JsonError`, `HackerNews::TransportError` |
+| Ruby | `Hacker::News::Error < StandardError` + `Hacker::News::TimeoutError`, `Hacker::News::HttpError`, `Hacker::News::JsonError`, `Hacker::News::TransportError` |
 | Python | `HackerNewsError(Exception)` + `TimeoutError(HackerNewsError)`, `HttpError`, `JsonError`, `TransportError` |
 | Go | `var ErrTimeout = errors.New("hn: timeout")`, `var ErrDecode = errors.New("hn: decode")` + `type HTTPError struct { Status int; URL string }` — checked via `errors.Is` / `errors.As` |
 | Rust | `#[derive(thiserror::Error)] pub enum Error { Timeout, Http { status: u16, url: String }, Decode(#[from] serde_json::Error), Transport(#[from] reqwest::Error) }` |
@@ -261,7 +263,7 @@ The mock server is the specification's reference implementation. If a library te
 | npm (JS) | `hacker-news-client` |
 | npm (TS) | `@hacker-news/client-ts` |
 | PyPI | `hacker-news-client` (dist) / `hacker_news_client` (import) |
-| RubyGems | `hacker_news` |
+| RubyGems | `hacker-news-client` |
 | crates.io | `hacker-news-client` |
 | Go module | `github.com/<user>/hacker-news-client/go` (monorepo submodule) |
 

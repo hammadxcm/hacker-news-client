@@ -49,13 +49,13 @@ Every library has the same four concerns, laid out in the language's idiomatic s
 | Types | `types.ts` / JSDoc | `types.py` | `items.rb` | `items.go` | `items.rs` |
 | Errors | `errors.js` / `errors.ts` | `errors.py` | `errors.rb` | `errors.go` | `errors.rs` |
 | Transport + client | `client.js` / `client.ts` | `client.py` | `client.rb` | `client.go` | `client.rs` |
-| Public entry | `index.js` / `index.ts` | `__init__.py` | `hacker_news.rb` | (package root) | `lib.rs` |
+| Public entry | `index.js` / `index.ts` | `__init__.py` | `hacker/news/client.rb` | (package root) | `lib.rs` |
 
 ### Why these four?
 
 1. **Types** are the wire-shape. The `Item` sum type (tagged by a `type` string discriminator) is the load-bearing modeling decision — every library renders it in whatever way its type system supports (discriminated union in TS / Rust, subclass hierarchy in Ruby, `@dataclass` union in Python, sealed interface in Go, JSDoc union in JS).
 
-2. **Errors** are uniform in semantics but idiomatic in surface: `HackerNewsError` + subclasses in JS/TS/Python/Ruby; sentinels + `*HTTPError` in Go; a `thiserror` enum in Rust.
+2. **Errors** are uniform in semantics but idiomatic in surface: `HackerNewsError` + subclasses in JS/TS/Python (`Hacker::News::Error` + subclasses in Ruby); sentinels + `*HTTPError` in Go; a `thiserror` enum in Rust.
 
 3. **Transport + client** contains the HTTP layer and the high-level methods. The transport is **always injectable** (except in Rust, where `reqwest` is already abstracted) — this is how unit tests mock.
 

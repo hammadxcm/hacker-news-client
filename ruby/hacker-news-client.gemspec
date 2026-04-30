@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative 'lib/hacker_news/version'
+require_relative 'lib/hacker/news/version'
 
 Gem::Specification.new do |s|
-  s.name = 'hacker_news'
-  s.version = HackerNews::VERSION
+  s.name = 'hacker-news-client'
+  s.version = Hacker::News::VERSION
   s.summary = 'Zero-dep Ruby client for the Hacker News Firebase API.'
   s.description = 'Idiomatic, stdlib-only wrapper over the Hacker News v0 API.'
   s.authors = ['hacker-news-client contributors']
