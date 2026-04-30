@@ -33,6 +33,7 @@ uv.lock
 .ruby-lsp/
 vendor/
 Gemfile.lock
+*.gem
 
 # Rust
 target/
