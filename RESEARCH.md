@@ -263,7 +263,7 @@ Sampled ~12 community clients across npm, PyPI, RubyGems, pkg.go.dev, crates.io.
 
 ### Python (3.10+)
 
-- **Naming**: `snake_case` methods and modules; dist `hacker-news-client`, import `hacker_news_client`.
+- **Naming**: `snake_case` methods and modules; PyPI dist `hn-api-client` (the suite-preferred `hacker-news-client` / `hn-client` are blocked by PyPI's similarity rule against existing `hackernews-client` / `hnclient`), import `hacker_news_client`.
 - **Errors**: `HackerNewsError(Exception)` base + subclasses; raised.
 - **Item modeling**: `@dataclass(frozen=True)` per variant + `Item: TypeAlias = Story | Comment | Job | Poll | PollOpt`; callers use structural `match`.
 - **Concurrency**: sync core uses `concurrent.futures.ThreadPoolExecutor`; optional `[async]` extra uses `httpx.AsyncClient` + `asyncio.Semaphore`.

@@ -262,7 +262,7 @@ The mock server is the specification's reference implementation. If a library te
 |---|---|
 | npm (JS) | `hacker-news-client` |
 | npm (TS) | `@hacker-news/client-ts` |
-| PyPI | `hacker-news-client` (dist) / `hacker_news_client` (import) |
+| PyPI | `hn-api-client` (dist) / `hacker_news_client` (import). PyPI's similarity rule blocks `hacker-news-client` and `hn-client` (collide with existing `hackernews-client` / `hnclient`); the suite-aligned `hn-api-client` is distinctive enough to pass. |
 | RubyGems | `hacker-news-client` |
 | crates.io | `hacker-news-client` |
 | Go module | `github.com/<user>/hacker-news-client/go` (monorepo submodule) |

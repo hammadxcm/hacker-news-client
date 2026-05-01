@@ -136,7 +136,7 @@ More: [`ts/README.md`](./ts/README.md)
 <summary><b>Python (3.10+)</b></summary>
 
 ```bash
-pip install hacker-news-client
+pip install hn-api-client
 ```
 
 ```python

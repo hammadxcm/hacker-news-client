@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "hacker-news-client"
+name = "hn-api-client"
 version = "0.1.0"
 description = "Zero-dep client for the Hacker News Firebase API."
 readme = "README.md"
