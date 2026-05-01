@@ -9,6 +9,7 @@ description = "Zero-dep client for the Hacker News Firebase API."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "MIT"
+license-files = ["LICENSE"]
 keywords = ["hacker-news", "hackernews", "hn", "api", "client"]
 dependencies = []
 
