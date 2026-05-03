@@ -16,12 +16,12 @@ Established at v0.1.0. These names are permanent; only the version changes for s
 
 | Language | Registry | Published as | Project URL |
 |---|---|---|---|
-| Ruby | RubyGems | `hacker-news-client` | https://rubygems.org/gems/hacker-news-client |
-| Python | PyPI | `hn-api-client` (dist) / `hacker_news_client` (import) | https://pypi.org/project/hn-api-client/ |
-| Rust | crates.io | `hacker-news-client` | https://crates.io/crates/hacker-news-client |
-| JS | npm | `@hammadxcm/hn-api-client-js` | https://www.npmjs.com/package/@hammadxcm/hn-api-client-js |
-| TS | npm | `@hammadxcm/hn-api-client-ts` | https://www.npmjs.com/package/@hammadxcm/hn-api-client-ts |
-| Go | proxy.golang.org | `github.com/hammadxcm/hacker-news-client/go` | https://pkg.go.dev/github.com/hammadxcm/hacker-news-client/go |
+| Ruby | RubyGems | `hacker-news-client` | <https://rubygems.org/gems/hacker-news-client> |
+| Python | PyPI | `hn-api-client` (dist) / `hacker_news_client` (import) | <https://pypi.org/project/hn-api-client/> |
+| Rust | crates.io | `hacker-news-client` | <https://crates.io/crates/hacker-news-client> |
+| JS | npm | `@hammadxcm/hn-api-client-js` | <https://www.npmjs.com/package/@hammadxcm/hn-api-client-js> |
+| TS | npm | `@hammadxcm/hn-api-client-ts` | <https://www.npmjs.com/package/@hammadxcm/hn-api-client-ts> |
+| Go | proxy.golang.org | `github.com/hammadxcm/hacker-news-client/go` | <https://pkg.go.dev/github.com/hammadxcm/hacker-news-client/go> |
 
 The naming asymmetries are intentional. PyPI's similarity rule blocks `hacker-news-client` and `hn-client` (collide with existing `hackernews-client`/`hnclient`), and the unscoped `hacker-news-client` was already taken on npm. See `DESIGN.md` §6 for the audit trail.
 
@@ -76,14 +76,14 @@ Use **the narrowest scope possible** and an expiration:
 
 | Registry | Where | Scope to choose |
 |---|---|---|
-| RubyGems | https://rubygems.org/profile/api_keys | name `gha-publish`, scope **Push rubygem** only, narrow to gem `hacker-news-client` |
-| PyPI | https://pypi.org/manage/account/token/ | name `gha-publish`, scope **Project: hn-api-client** |
-| crates.io | https://crates.io/settings/tokens | name `gha-publish`, scope **`publish-update`**, crate **`hacker-news-client`** only |
-| npm | https://www.npmjs.com/settings/hammadxcm/tokens | **Granular Access Token**, packages **`@hammadxcm/*`**, **read+write**, expiration 90 days |
+| RubyGems | <https://rubygems.org/profile/api_keys> | name `gha-publish`, scope **Push rubygem** only, narrow to gem `hacker-news-client` |
+| PyPI | <https://pypi.org/manage/account/token/> | name `gha-publish`, scope **Project: hn-api-client** |
+| crates.io | <https://crates.io/settings/tokens> | name `gha-publish`, scope **`publish-update`**, crate **`hacker-news-client`** only |
+| npm | <https://www.npmjs.com/settings/hammadxcm/tokens> | **Granular Access Token**, packages **`@hammadxcm/*`**, **read+write**, expiration 90 days |
 
 ### 2. Create four GitHub environments with scoped secrets
 
-At https://github.com/hammadxcm/hacker-news-client/settings/environments → **New environment** (×4):
+At <https://github.com/hammadxcm/hacker-news-client/settings/environments> → **New environment** (×4):
 
 | Environment | Secret name | Value |
 |---|---|---|
@@ -102,7 +102,7 @@ Same environments page → for each, check **"Required reviewers"** and add your
 
 The workflow already requests `id-token: write` so OIDC migration is a no-code change:
 
-- **PyPI** — set up a Trusted Publisher at https://pypi.org/manage/project/hn-api-client/settings/publishing/ matching repo `hammadxcm/hacker-news-client`, workflow `publish.yml`, environment `release-pypi`. Then delete the `password:` line from the workflow. **No PyPI token in GitHub secrets ever again.**
+- **PyPI** — set up a Trusted Publisher at <https://pypi.org/manage/project/hn-api-client/settings/publishing/> matching repo `hammadxcm/hacker-news-client`, workflow `publish.yml`, environment `release-pypi`. Then delete the `password:` line from the workflow. **No PyPI token in GitHub secrets ever again.**
 - **npm** — Trusted Publishing is in beta as of 2026-05; once GA you can drop `NPM_TOKEN` similarly. The `--provenance` flag is already on, writing SLSA attestations downstream `npm install`ers can verify with `npm audit signatures`.
 
 That eliminates two of the four secrets.
@@ -163,7 +163,7 @@ gem build hacker-news-client.gemspec
 gem push hacker-news-client-0.2.0.gem
 ```
 
-The gemspec sets `rubygems_mfa_required = true`, so `gem push` prompts for an MFA OTP from your authenticator app. Verify at https://rubygems.org/gems/hacker-news-client.
+The gemspec sets `rubygems_mfa_required = true`, so `gem push` prompts for an MFA OTP from your authenticator app. Verify at <https://rubygems.org/gems/hacker-news-client>.
 
 #### Python — `cd python`
 
@@ -173,7 +173,7 @@ python3 -m build                                   # produces sdist + wheel
 python3 -m twine upload dist/hn_api_client-0.2.0*  # prompts for token if no ~/.pypirc
 ```
 
-If `twine` isn't installed: `pip install build twine`. Verify at https://pypi.org/project/hn-api-client/.
+If `twine` isn't installed: `pip install build twine`. Verify at <https://pypi.org/project/hn-api-client/>.
 
 #### Rust — `cd rust`
 
@@ -181,7 +181,7 @@ If `twine` isn't installed: `pip install build twine`. Verify at https://pypi.or
 cargo publish
 ```
 
-`cargo publish` does its own pre-flight build, package, and verify, then uploads. The token comes from `~/.cargo/credentials.toml` (set up via `cargo login`). Verify at https://crates.io/crates/hacker-news-client and https://docs.rs/hacker-news-client.
+`cargo publish` does its own pre-flight build, package, and verify, then uploads. The token comes from `~/.cargo/credentials.toml` (set up via `cargo login`). Verify at <https://crates.io/crates/hacker-news-client> and <https://docs.rs/hacker-news-client>.
 
 #### JS — `cd js`
 
@@ -189,7 +189,7 @@ cargo publish
 npm publish      # publishConfig.access = "public" is set in package.json
 ```
 
-The package is scoped (`@hammadxcm/...`), so the `--access public` flag is implicit through `publishConfig` in `package.json`. Verify at https://www.npmjs.com/package/@hammadxcm/hn-api-client-js.
+The package is scoped (`@hammadxcm/...`), so the `--access public` flag is implicit through `publishConfig` in `package.json`. Verify at <https://www.npmjs.com/package/@hammadxcm/hn-api-client-js>.
 
 #### TS — `cd ts`
 
@@ -275,9 +275,9 @@ For the **manual fallback path**, each registry stores its credential locally:
 | Registry | Where (local CLI) | Recommended scope |
 |---|---|---|
 | RubyGems | `~/.local/share/gem/credentials` (set by `gem signin`) | The `rubygems_mfa_required` metadata flag means MFA OTP is required at every push for human accounts. API keys with the `mfa` + `index_rubygems` scopes bypass the prompt — that's what CI uses. |
-| PyPI | `~/.pypirc` or `TWINE_PASSWORD` env var | Project-scoped token for `hn-api-client` (https://pypi.org/manage/account/token/). |
-| crates.io | `~/.cargo/credentials.toml` (set by `cargo login`) | Crate-scoped token for `hacker-news-client` with `publish-update` only (https://crates.io/settings/tokens). |
-| npm | `~/.npmrc` (set by `npm login`) | Granular token, scoped to `@hammadxcm/*`, **read+write**, with expiration (https://www.npmjs.com/settings/hammadxcm/tokens). |
+| PyPI | `~/.pypirc` or `TWINE_PASSWORD` env var | Project-scoped token for `hn-api-client` (<https://pypi.org/manage/account/token/>). |
+| crates.io | `~/.cargo/credentials.toml` (set by `cargo login`) | Crate-scoped token for `hacker-news-client` with `publish-update` only (<https://crates.io/settings/tokens>). |
+| npm | `~/.npmrc` (set by `npm login`) | Granular token, scoped to `@hammadxcm/*`, **read+write**, with expiration (<https://www.npmjs.com/settings/hammadxcm/tokens>). |
 
 ### Treating a leaked token as compromised
 
@@ -298,7 +298,7 @@ All four token-protected registries support yanking a published version, but **n
 | Registry | Command |
 |---|---|
 | RubyGems | `gem yank hacker-news-client -v 0.2.0` |
-| PyPI | Use the web UI (https://pypi.org/manage/project/hn-api-client/release/0.2.0/) — `twine` has no yank command. |
+| PyPI | Use the web UI (<https://pypi.org/manage/project/hn-api-client/release/0.2.0/>) — `twine` has no yank command. |
 | crates.io | `cargo yank --version 0.2.0 hacker-news-client` |
 | npm | `npm unpublish @hammadxcm/hn-api-client-js@0.2.0` (only works within 72h of publish; after that, contact npm support). |
 | Go | Delete the `go/v0.2.0` tag locally + remotely. The proxy retains the cached version forever — yanking is impossible after `proxy.golang.org` has served it once. |

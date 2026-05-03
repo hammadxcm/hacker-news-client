@@ -42,7 +42,12 @@ jobs:
           pip install pip-audit
           pip install -e ".[async]" || pip install -e .
       - name: Run pip-audit against installed environment
-        run: pip-audit --skip-editable --progress-spinner=off
+        # CVE-2026-3219 is in pip itself (the runner's installer), not in
+        # our Python package. No patched pip release available yet —
+        # suppress until upstream ships a fix. Re-evaluate by removing
+        # this flag periodically; if pip-audit no longer reports it,
+        # take the flag back out.
+        run: pip-audit --skip-editable --progress-spinner=off --ignore-vuln CVE-2026-3219
 
   ruby-audit:
     name: bundler-audit (Ruby)
