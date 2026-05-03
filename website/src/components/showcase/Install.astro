@@ -1,0 +1,332 @@
+---
+import { languages } from '../../data/languages';
+import { defaultLocale, type LocaleId } from '../../data/locales';
+import { getTranslator } from '../../i18n';
+
+interface Props {
+  locale?: LocaleId;
+}
+const { locale = defaultLocale } = Astro.props;
+const t = getTranslator(locale);
+---
+
+<section class="install section" id="install">
+  <div class="container">
+    <header class="section-header" data-reveal>
+      <h2 class="section-title">{t('install.title')}</h2>
+      <p class="section-subtitle">{t('install.subtitle')}</p>
+    </header>
+
+    <div class="install-tabs" data-tabs data-reveal data-reveal-delay="120">
+      <div class="install-tablist" role="tablist" aria-label="Language">
+        <span class="install-indicator" data-tab-indicator aria-hidden="true"></span>
+        {
+          languages.map((lang, idx) => (
+            <button
+              role="tab"
+              type="button"
+              data-tab={lang.id}
+              aria-selected={idx === 0 ? 'true' : 'false'}
+              aria-controls={`panel-${lang.id}`}
+              id={`tab-${lang.id}`}
+              tabindex={idx === 0 ? 0 : -1}
+              class="install-tab"
+            >
+              <span class="install-tab-dot" style={`background: ${lang.iconColor}`} />
+              <span class="install-tab-name">{lang.name}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="install-panels">
+        {
+          languages.map((lang, idx) => (
+            <div
+              role="tabpanel"
+              id={`panel-${lang.id}`}
+              data-tab-panel={lang.id}
+              aria-labelledby={`tab-${lang.id}`}
+              hidden={idx !== 0}
+              class:list={['install-panel', { 'is-active': idx === 0 }]}
+            >
+              <div class="install-card terminal">
+                <div class="terminal-header">
+                  <span class="terminal-dot terminal-dot--red" />
+                  <span class="terminal-dot terminal-dot--yellow" />
+                  <span class="terminal-dot terminal-dot--green" />
+                  <span class="terminal-title">{lang.registry}</span>
+                  <button
+                    type="button"
+                    class="install-copy"
+                    data-copy={lang.installCommand}
+                    data-label-default={t('install.copy')}
+                    data-label-copied={t('install.copied')}
+                  >
+                    <svg
+                      width="13"
+                      height="13"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    <span>{t('install.copy')}</span>
+                  </button>
+                </div>
+                <div class="terminal-body">
+                  <pre>
+                    <span class="terminal-prompt">$</span>
+                    {lang.installCommand}
+                  </pre>
+                </div>
+              </div>
+
+              <div class="install-card terminal">
+                <div class="terminal-header">
+                  <span class="terminal-dot terminal-dot--red" />
+                  <span class="terminal-dot terminal-dot--yellow" />
+                  <span class="terminal-dot terminal-dot--green" />
+                  <span class="terminal-title">{`example.${lang.id}`}</span>
+                </div>
+                <div class="terminal-body">
+                  <pre>{lang.usageSnippet}</pre>
+                </div>
+              </div>
+
+              <p class="install-meta">
+                <a href={lang.registryUrl} rel="noopener" target="_blank">
+                  {lang.registry}
+                  <span class="install-meta-sep">→</span>
+                  <code>{lang.packageName}</code>
+                </a>
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .install-tabs {
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  .install-tablist {
+    position: relative;
+    display: flex;
+    gap: 2px;
+    flex-wrap: wrap;
+    padding: 6px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+  }
+
+  .install-indicator {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    transform: translateX(0);
+    transition:
+      transform 380ms var(--ease-out-expo),
+      width 380ms var(--ease-out-expo);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .install-indicator::after {
+    content: '';
+    position: absolute;
+    inset-inline: 18%;
+    bottom: 4px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-brand) 50%, transparent);
+    opacity: 0.85;
+  }
+
+  .install-tab {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition:
+      color 200ms var(--ease-out-expo),
+      transform 200ms var(--ease-out-expo);
+    background: transparent;
+    border: 0;
+  }
+
+  .install-tab:hover {
+    color: var(--color-text-primary);
+  }
+
+  .install-tab[aria-selected='true'] {
+    color: var(--color-text-primary);
+  }
+
+  .install-tab:active {
+    transform: scale(0.97);
+  }
+
+  .install-tab-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: box-shadow 240ms var(--ease-out-expo);
+  }
+
+  .install-tab[aria-selected='true'] .install-tab-dot {
+    box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 0%, transparent), 0 0 8px currentColor;
+  }
+
+  .install-panels {
+    position: relative;
+  }
+
+  .install-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: panel-fade 320ms var(--ease-out-expo);
+  }
+
+  .install-panel[hidden] {
+    display: none;
+  }
+
+  @keyframes panel-fade {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .install-card .terminal-header {
+    position: relative;
+  }
+
+  .install-copy {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    background: var(--color-bg-elevated);
+    color: var(--color-text-secondary);
+    border: 1px solid var(--color-border);
+    transition:
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo),
+      transform 200ms var(--ease-out-expo);
+  }
+
+  .install-copy:hover {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+    transform: translateY(-1px);
+  }
+
+  .install-copy.is-copied {
+    color: var(--color-good);
+    border-color: var(--color-good);
+  }
+
+  .install-meta {
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+
+  .install-meta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 200ms var(--ease-out-expo);
+  }
+
+  .install-meta a:hover {
+    color: var(--color-brand);
+  }
+
+  .install-meta-sep {
+    color: var(--color-brand);
+  }
+
+  .install-meta code {
+    font-family: inherit;
+    color: var(--color-text-secondary);
+  }
+
+  .install-meta a:hover code {
+    color: var(--color-brand);
+  }
+
+  [data-reveal].install-tabs {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 700ms var(--ease-out-expo),
+      transform 700ms var(--ease-out-expo);
+  }
+
+  [data-reveal].install-tabs.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .install-indicator,
+    .install-panel,
+    .install-tab,
+    .install-tab-dot,
+    .install-copy {
+      transition: none;
+      animation: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .install-tab-name {
+      font-size: 13px;
+    }
+    .install-tablist {
+      gap: 0;
+    }
+  }
+</style>

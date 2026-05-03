@@ -1,0 +1,29 @@
+---
+import { defaultLocale, type LocaleId } from '../data/locales';
+import Footer from './common/Footer.astro';
+import Nav from './common/Nav.astro';
+import Hero from './hero/Hero.astro';
+import ApiPreview from './showcase/ApiPreview.astro';
+import Comparison from './showcase/Comparison.astro';
+import Features from './showcase/Features.astro';
+import Install from './showcase/Install.astro';
+import Marquee from './showcase/Marquee.astro';
+import Stats from './showcase/Stats.astro';
+
+interface Props {
+  locale?: LocaleId;
+}
+const { locale = defaultLocale } = Astro.props;
+---
+
+<Nav locale={locale} />
+<main id="main">
+  <Hero locale={locale} />
+  <Marquee />
+  <Stats locale={locale} />
+  <Features locale={locale} />
+  <Install locale={locale} />
+  <ApiPreview locale={locale} />
+  <Comparison locale={locale} />
+</main>
+<Footer locale={locale} />

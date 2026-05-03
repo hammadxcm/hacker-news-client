@@ -1,0 +1,111 @@
+---
+import { defaultLocale, type LocaleId, locales } from '../data/locales';
+import { site } from '../data/site';
+import '../styles/global.css';
+import '../styles/themes.css';
+import '../styles/animations.css';
+import '../styles/terminal.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  locale?: LocaleId;
+}
+
+const { title, description, locale = defaultLocale } = Astro.props;
+const localeInfo = locales.find((l) => l.id === locale) ?? locales[0];
+const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — ${site.tagline}`;
+const pageDescription = description ?? site.description;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+---
+
+<!doctype html>
+<html lang={locale} dir={localeInfo.dir}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}favicon.svg`.replace(/\/\//g, '/')} />
+    <link rel="canonical" href={canonical} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={pageDescription} />
+
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+
+    {
+      (() => {
+        const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+        const path = Astro.url.pathname.startsWith(base)
+          ? Astro.url.pathname.slice(base.length)
+          : Astro.url.pathname;
+        const stripped =
+          path.replace(/^\/(en|es|fr|de|pt|ru|zh|hi|ar|ur|bn|ja)(\/|$)/, '/') || '/';
+        return locales.map((alt) => {
+          const localePart = alt.id === defaultLocale ? '' : `/${alt.id}`;
+          const tail = stripped === '/' ? '/' : stripped;
+          const href = new URL(`${base}${localePart}${tail}`, Astro.site).toString();
+          return <link rel="alternate" hreflang={alt.id} href={href} />;
+        });
+      })()
+    }
+
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('hn-client-theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.style.colorScheme = theme;
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a href="#main" class="sr-only">Skip to main content</a>
+    <slot />
+
+    <script>
+      import { setupHeroCanvas } from '../scripts/canvas';
+      import { setupCopyButtons } from '../scripts/copy-button';
+      import { setupInstallTabs } from '../scripts/install-tabs';
+      import { setupRevealObserver } from '../scripts/observer';
+      import { setupThemeToggle } from '../scripts/theme-switcher';
+      import { setupTypingTerminal } from '../scripts/typing';
+
+      setupCopyButtons();
+      setupInstallTabs();
+      setupRevealObserver();
+
+      const themeToggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+      if (themeToggle) {
+        setupThemeToggle(themeToggle);
+      }
+
+      const heroCanvas = document.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+      if (heroCanvas) {
+        setupHeroCanvas(heroCanvas);
+      }
+
+      const typingTerminal = document.querySelector<HTMLElement>('[data-typing-terminal]');
+      if (typingTerminal) {
+        setupTypingTerminal(typingTerminal);
+      }
+    </script>
+  </body>
+</html>

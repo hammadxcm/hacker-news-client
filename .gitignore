@@ -6,10 +6,13 @@ node_modules/
 dist/
 *.tsbuildinfo
 yarn.lock
-pnpm-lock.yaml
 # Note: package-lock.json IS committed at the monorepo root for reproducible
 # CI and Dependabot updates. Workspaces (js/, ts/) inherit the root lock,
 # so no per-workspace lock is needed.
+# website/ is its own pnpm-managed package; its lockfile IS committed.
+
+# Astro
+.astro/
 
 # Coverage output
 coverage/
@@ -43,3 +46,6 @@ Cargo.lock
 .idea/
 .vscode/
 *.swp
+
+# Claude Code local config
+.claude/

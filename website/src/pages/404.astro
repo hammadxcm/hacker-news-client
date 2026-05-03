@@ -1,0 +1,60 @@
+---
+import { site } from '../data/site';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="404 — Not found">
+  <main id="main" class="notfound">
+    <div class="container notfound-inner">
+      <p class="notfound-status">404</p>
+      <h1 class="notfound-title">Page not found</h1>
+      <p class="notfound-body">
+        The page you're looking for doesn't exist. Head back home or check the source on GitHub.
+      </p>
+      <div class="notfound-actions">
+        <a href={import.meta.env.BASE_URL} class="btn btn-primary">Back home</a>
+        <a href={site.repo} class="btn btn-secondary" rel="noopener" target="_blank">GitHub</a>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .notfound {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .notfound-inner {
+    max-width: 480px;
+  }
+
+  .notfound-status {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--color-brand);
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .notfound-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .notfound-body {
+    color: var(--color-text-secondary);
+    margin-bottom: 28px;
+  }
+
+  .notfound-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+</style>

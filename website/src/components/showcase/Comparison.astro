@@ -1,0 +1,157 @@
+---
+import { defaultLocale, type LocaleId } from '../../data/locales';
+import { getTranslator } from '../../i18n';
+
+interface Props {
+  locale?: LocaleId;
+}
+const { locale = defaultLocale } = Astro.props;
+const t = getTranslator(locale);
+---
+
+<section class="compare section" id="compare">
+  <div class="container">
+    <header class="section-header" data-reveal>
+      <h2 class="section-title">{t('compare.title')}</h2>
+      <p class="section-subtitle">{t('compare.subtitle')}</p>
+    </header>
+
+    <div class="compare-grid">
+      <article class="compare-card compare-card--bad" data-reveal>
+        <header class="compare-card-header">
+          <span class="compare-card-icon" aria-hidden="true">✗</span>
+          <h3 class="compare-card-title">{t('compare.before.title')}</h3>
+        </header>
+        <ul class="compare-list">
+          <li>{t('compare.before.line1')}</li>
+          <li>{t('compare.before.line2')}</li>
+          <li>{t('compare.before.line3')}</li>
+          <li>{t('compare.before.line4')}</li>
+        </ul>
+      </article>
+
+      <article class="compare-card compare-card--good" data-reveal data-reveal-delay="120">
+        <header class="compare-card-header">
+          <span class="compare-card-icon" aria-hidden="true">✓</span>
+          <h3 class="compare-card-title">{t('compare.after.title')}</h3>
+        </header>
+        <ul class="compare-list">
+          <li>{t('compare.after.line1')}</li>
+          <li>{t('compare.after.line2')}</li>
+          <li>{t('compare.after.line3')}</li>
+          <li>{t('compare.after.line4')}</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<style>
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+
+  .compare-card {
+    padding: 28px 32px;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .compare-card--bad {
+    opacity: 0.85;
+  }
+
+  .compare-card--good {
+    border-color: var(--color-brand);
+    box-shadow:
+      0 0 0 1px var(--color-brand-glow),
+      0 8px 32px rgba(255, 102, 0, 0.06);
+  }
+
+  [data-reveal].compare-card {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 700ms var(--ease-out-expo),
+      transform 700ms var(--ease-out-expo);
+  }
+
+  [data-reveal].compare-card.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .compare-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .compare-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .compare-card--bad .compare-card-icon {
+    background: rgba(255, 107, 107, 0.15);
+    color: var(--color-bad);
+  }
+
+  .compare-card--good .compare-card-icon {
+    background: rgba(81, 207, 102, 0.15);
+    color: var(--color-good);
+  }
+
+  .compare-card-title {
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .compare-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--color-text-secondary);
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+
+  .compare-list li {
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .compare-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 9px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-text-muted);
+  }
+
+  .compare-card--good .compare-list li::before {
+    background: var(--color-brand);
+  }
+
+  @media (max-width: 720px) {
+    .compare-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

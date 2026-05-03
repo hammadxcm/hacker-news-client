@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hammadxcm.github.io/hacker-news-client/sitemap-index.xml

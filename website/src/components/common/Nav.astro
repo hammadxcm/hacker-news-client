@@ -1,0 +1,129 @@
+---
+import { defaultLocale, type LocaleId, localePath, locales } from '../../data/locales';
+import { site } from '../../data/site';
+import { getTranslator } from '../../i18n';
+import LangSwitcher from '../ui/LangSwitcher.astro';
+import Logo from '../ui/Logo.astro';
+import ThemeToggle from '../ui/ThemeToggle.astro';
+
+interface Props {
+  locale?: LocaleId;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const t = getTranslator(locale);
+---
+
+<header class="nav" data-nav>
+  <script is:inline>
+    (function () {
+      const nav = document.currentScript?.parentElement;
+      if (!nav) return;
+      let scrolled = false;
+      function update() {
+        const next = window.scrollY > 12;
+        if (next !== scrolled) {
+          scrolled = next;
+          nav.classList.toggle('is-scrolled', scrolled);
+        }
+      }
+      update();
+      window.addEventListener('scroll', update, { passive: true });
+    })();
+  </script>
+  <div class="container nav-inner">
+    <a href={localePath(locale)} class="nav-brand" aria-label={site.name}>
+      <Logo />
+      <span class="nav-brand-name">{site.shortName}</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#features">{t('nav.features')}</a>
+      <a href="#install">{t('nav.install')}</a>
+      <a href="#api">{t('nav.api')}</a>
+      <a href="#compare">{t('nav.compare')}</a>
+    </nav>
+
+    <div class="nav-actions">
+      <LangSwitcher locale={locale} locales={locales} />
+      <ThemeToggle label={t('theme.toggle')} />
+      <a class="btn btn-secondary nav-github" href={site.repo} rel="noopener" target="_blank">
+        {t('nav.github')}
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    height: var(--nav-height);
+    background: transparent;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+    border-bottom: 1px solid transparent;
+    transition:
+      background-color 240ms var(--ease-out-expo),
+      backdrop-filter 240ms var(--ease-out-expo),
+      border-color 240ms var(--ease-out-expo);
+  }
+
+  .nav.is-scrolled {
+    background: var(--color-bg-overlay);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-bottom-color: var(--color-border);
+  }
+
+  .nav-inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .nav-brand-name {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    letter-spacing: -0.01em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+  }
+
+  .nav-links a:hover {
+    color: var(--color-text-primary);
+  }
+
+  .nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .nav-github {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+  }
+</style>

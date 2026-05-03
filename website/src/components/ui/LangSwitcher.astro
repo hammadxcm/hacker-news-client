@@ -1,0 +1,66 @@
+---
+import { defaultLocale, type LocaleId, type LocaleInfo } from '../../data/locales';
+
+interface Props {
+  locale: LocaleId;
+  locales: LocaleInfo[];
+}
+
+const { locale, locales } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = Astro.url.pathname.startsWith(base) ? Astro.url.pathname.slice(base.length) : Astro.url.pathname;
+const stripped = path.replace(/^\/(en|es|fr|de|pt|ru|zh|hi|ar|ur|bn|ja)(\/|$)/, '/') || '/';
+
+function urlFor(target: LocaleId): string {
+  if (target === defaultLocale) {
+    return stripped === '/' ? `${base}/` : `${base}${stripped}`;
+  }
+  return stripped === '/' ? `${base}/${target}/` : `${base}/${target}${stripped}`;
+}
+---
+
+<div class="lang-switcher">
+  <label for="lang-select" class="sr-only">Language</label>
+  <select
+    id="lang-select"
+    class="lang-select"
+    onchange="if (this.value) window.location.href = this.value"
+  >
+    {
+      locales.map((l) => (
+        <option value={urlFor(l.id)} selected={l.id === locale}>
+          {l.nativeLabel}
+        </option>
+      ))
+    }
+  </select>
+</div>
+
+<style>
+  .lang-switcher {
+    position: relative;
+  }
+
+  .lang-select {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 38px;
+    padding: 0 32px 0 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-surface);
+    color: var(--color-text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 200ms var(--ease-out-expo);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M3 5l3 3 3-3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+  }
+
+  .lang-select:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-border-strong);
+  }
+</style>

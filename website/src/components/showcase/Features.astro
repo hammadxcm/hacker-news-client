@@ -1,0 +1,140 @@
+---
+import { defaultLocale, type LocaleId } from '../../data/locales';
+import { getTranslator } from '../../i18n';
+
+interface Props {
+  locale?: LocaleId;
+}
+const { locale = defaultLocale } = Astro.props;
+const t = getTranslator(locale);
+
+const features = [
+  { id: 'idiomatic', icon: '🎨' },
+  { id: 'contract', icon: '📜' },
+  { id: 'mock', icon: '🧪' },
+  { id: 'verify', icon: '✅' },
+  { id: 'zero', icon: '📦' },
+  { id: 'types', icon: '🔒' },
+] as const;
+
+const titles = features.map((f) => ({
+  ...f,
+  title: t(`features.${f.id}.title` as const),
+  body: t(`features.${f.id}.body` as const),
+}));
+---
+
+<section class="features section" id="features">
+  <div class="container">
+    <header class="section-header" data-reveal>
+      <h2 class="section-title">{t('features.title')}</h2>
+      <p class="section-subtitle">{t('features.subtitle')}</p>
+    </header>
+
+    <ul class="features-grid">
+      {
+        titles.map((feature, idx) => (
+          <li class="feature" data-reveal data-reveal-delay={idx * 60}>
+            <span class="feature-icon" aria-hidden="true">
+              {feature.icon}
+            </span>
+            <h3 class="feature-title">{feature.title}</h3>
+            <p class="feature-body">{feature.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .features-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .feature {
+    padding: 28px;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition:
+      transform 280ms var(--ease-out-expo),
+      border-color 280ms var(--ease-out-expo),
+      box-shadow 280ms var(--ease-out-expo),
+      background-color 280ms var(--ease-out-expo);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .feature::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle 200px at var(--mx, 50%) var(--my, 50%),
+      var(--color-brand-glow) 0%,
+      transparent 60%
+    );
+    opacity: 0;
+    transition: opacity 280ms var(--ease-out-expo);
+    pointer-events: none;
+  }
+
+  .feature:hover {
+    border-color: var(--color-border-strong);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    background: var(--color-bg-elevated);
+  }
+
+  .feature:hover::before {
+    opacity: 1;
+  }
+
+  .feature > * {
+    position: relative;
+  }
+
+  [data-reveal].feature {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 600ms var(--ease-out-expo),
+      transform 600ms var(--ease-out-expo);
+  }
+
+  [data-reveal].feature.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .feature-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+
+  .feature-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .feature-body {
+    font-size: 14.5px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+</style>

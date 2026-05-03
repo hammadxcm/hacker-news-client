@@ -1,0 +1,34 @@
+[data-theme="light"] {
+  --color-bg-base: #fafafa;
+  --color-bg-surface: #ffffff;
+  --color-bg-elevated: #f4f4f5;
+  --color-bg-overlay: rgba(250, 250, 250, 0.78);
+  --color-border: #e4e4e7;
+  --color-border-strong: #d4d4d8;
+
+  --color-text-primary: #0b0d12;
+  --color-text-secondary: #52525b;
+  --color-text-muted: #71717a;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+
+  color-scheme: light;
+}
+
+html {
+  transition: background-color 300ms var(--ease-out-expo);
+}
+
+body,
+.btn,
+.glass,
+.card {
+  transition:
+    background-color 300ms var(--ease-out-expo),
+    border-color 300ms var(--ease-out-expo),
+    color 300ms var(--ease-out-expo);
+}

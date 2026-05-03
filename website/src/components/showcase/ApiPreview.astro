@@ -1,0 +1,121 @@
+---
+import { defaultLocale, type LocaleId } from '../../data/locales';
+import { getTranslator } from '../../i18n';
+
+interface Props {
+  locale?: LocaleId;
+}
+const { locale = defaultLocale } = Astro.props;
+const t = getTranslator(locale);
+
+const methods = [
+  { name: 'item(id)', description: 'Fetch a story, comment, job, poll, or askHN by id.' },
+  { name: 'user(id)', description: 'Fetch a user profile and metadata.' },
+  { name: 'topStories()', description: 'IDs of the current top 500 stories.' },
+  { name: 'newStories()', description: 'IDs of the most recent 500 stories.' },
+  { name: 'bestStories()', description: 'IDs of the current best 500 stories.' },
+  { name: 'maxItem()', description: 'Highest item id currently issued by HN.' },
+  { name: 'updates()', description: 'Recently changed items and profiles.' },
+];
+---
+
+<section class="api section" id="api">
+  <div class="container">
+    <header class="section-header" data-reveal>
+      <h2 class="section-title">{t('api.title')}</h2>
+      <p class="section-subtitle">{t('api.subtitle')}</p>
+    </header>
+
+    <div class="api-grid">
+      <ul class="api-methods" data-reveal data-reveal-delay="120">
+        {
+          methods.map((m, idx) => (
+            <li class="api-method" style={`--api-i: ${idx}`}>
+              <code class="api-method-name">{m.name}</code>
+              <span class="api-method-desc">{m.description}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .api-grid {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .api-methods {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-bg-surface);
+  }
+
+  .api-method {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 24px;
+    padding: 18px 24px;
+    align-items: center;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .api-method:last-child {
+    border-bottom: none;
+  }
+
+  .api-method {
+    transition:
+      background-color 240ms var(--ease-out-expo),
+      transform 240ms var(--ease-out-expo);
+  }
+
+  .api-method:hover {
+    background: var(--color-bg-elevated);
+    transform: translateX(4px);
+  }
+
+  .api-method:hover .api-method-name {
+    color: var(--color-brand);
+    text-shadow: 0 0 12px var(--color-brand-glow);
+  }
+
+  [data-reveal].api-methods {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 700ms var(--ease-out-expo),
+      transform 700ms var(--ease-out-expo);
+  }
+
+  [data-reveal].api-methods.is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .api-method-name {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--color-brand);
+    font-weight: 500;
+  }
+
+  .api-method-desc {
+    color: var(--color-text-secondary);
+    font-size: 14.5px;
+  }
+
+  @media (max-width: 600px) {
+    .api-method {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+  }
+</style>

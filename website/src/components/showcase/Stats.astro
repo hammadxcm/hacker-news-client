@@ -1,0 +1,91 @@
+---
+import { defaultLocale, type LocaleId } from '../../data/locales';
+import { getTranslator } from '../../i18n';
+
+interface Props {
+  locale?: LocaleId;
+}
+const { locale = defaultLocale } = Astro.props;
+const t = getTranslator(locale);
+
+const stats = [
+  { value: '6', label: t('stats.languages') },
+  { value: '1', label: t('stats.contract') },
+  { value: '100+', label: t('stats.tests') },
+  { value: 'MIT', label: t('stats.license') },
+];
+---
+
+<section class="stats" aria-label="Project stats">
+  <div class="container">
+    <ul class="stats-grid">
+      {
+        stats.map((stat, idx) => (
+          <li class="stat" data-reveal data-reveal-delay={idx * 80}>
+            <span class="stat-value">{stat.value}</span>
+            <span class="stat-label">{stat.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .stats {
+    padding-block: 32px;
+    border-block: 1px solid var(--color-border);
+    background: var(--color-bg-surface);
+  }
+
+  .stats-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .stat {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  [data-reveal].stat {
+    opacity: 0;
+    transform: scale(0.92);
+    transition:
+      opacity 600ms var(--ease-out-expo),
+      transform 600ms var(--ease-out-back);
+  }
+
+  [data-reveal].stat.is-revealed {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--color-brand), var(--color-accent));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 640px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

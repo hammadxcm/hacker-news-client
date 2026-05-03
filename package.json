@@ -14,10 +14,13 @@
     "lint": "npm run lint:web && npm run lint:py && npm run lint:ruby && npm run lint:go && npm run lint:rust",
     "lint:js": "biome check js",
     "lint:ts": "biome check ts",
-    "lint:web": "biome check js ts",
-    "lint:fix": "biome check --write js ts",
+    "lint:web": "biome check js ts website/src",
+    "lint:fix": "biome check --write js ts website/src",
     "format": "biome format --write .",
-    "ci:biome": "biome ci js ts",
+    "ci:biome": "biome ci js ts website/src",
+    "site:dev": "cd website && pnpm dev",
+    "site:build": "cd website && pnpm build",
+    "site:typecheck": "cd website && pnpm typecheck",
     "lint:py": "ruff check python/src python/tests",
     "lint:ruby": "cd ruby && bundle exec rubocop",
     "lint:go": "cd go && go vet ./... && test -z \"$(gofmt -l .)\"",
@@ -42,6 +45,9 @@
     "{js,ts}/**/*.{js,mjs,ts}": [
       "biome check --write --no-errors-on-unmatched"
     ],
+    "website/src/**/*.{js,mjs,ts,tsx,css}": [
+      "biome check --write --no-errors-on-unmatched"
+    ],
     "*.{json,jsonc}": [
       "biome format --write --no-errors-on-unmatched"
     ],
@@ -61,5 +67,6 @@
   },
   "engines": {
     "node": ">=20"
-  }
+  },
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }
