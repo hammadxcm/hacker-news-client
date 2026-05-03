@@ -1,0 +1,252 @@
+name: Publish
+
+# Releases all six language clients on a `vX.Y.Z` tag push.
+# Each registry gets its own job so a failure in one doesn't block the others.
+# Secrets live in per-registry environments — compromise of one doesn't
+# expose the others.
+#
+# Trigger flow:
+#   1. Locally:  scripts/bump-version.sh 0.2.0
+#                git commit -am "release: v0.2.0"
+#                git tag -a v0.2.0 -m "v0.2.0"
+#                git push origin main v0.2.0
+#   2. This workflow runs on the v0.2.0 tag push.
+#   3. The `tag-go` job auto-creates `go/v0.2.0` if absent.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Pre-publish sanity check
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.parse.outputs.version }}
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: parse
+        name: Parse version from tag
+        run: |
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Releasing version $VERSION"
+
+      - name: VERSION file must match tag
+        env:
+          EXPECTED: ${{ steps.parse.outputs.version }}
+        run: |
+          FILE_VERSION=$(cat VERSION)
+          if [ "$FILE_VERSION" != "$EXPECTED" ]; then
+            echo "::error::VERSION file ($FILE_VERSION) does not match tag ($EXPECTED). Run scripts/bump-version.sh and re-tag."
+            exit 1
+          fi
+
+      - name: CHANGELOG must have a section for this version
+        env:
+          EXPECTED: ${{ steps.parse.outputs.version }}
+        run: |
+          if ! grep -qE "^## \[${EXPECTED}\]" CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no [$EXPECTED] section."
+            exit 1
+          fi
+
+  publish-ruby:
+    name: Ruby → RubyGems
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release-rubygems
+    env:
+      VERSION: ${{ needs.verify.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          working-directory: ruby
+
+      - name: Build gem
+        working-directory: ruby
+        run: gem build hacker-news-client.gemspec
+
+      - name: Push to RubyGems
+        working-directory: ruby
+        env:
+          GEM_HOST_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: gem push "hacker-news-client-${VERSION}.gem"
+
+  publish-python:
+    name: Python → PyPI
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release-pypi
+    permissions:
+      id-token: write   # for future migration to PyPI Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build sdist + wheel
+        working-directory: python
+        run: |
+          pip install --upgrade build
+          python -m build
+
+      - name: Upload to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: python/dist
+          # To migrate to OIDC Trusted Publishing later:
+          # 1. Configure at https://pypi.org/manage/project/hn-api-client/settings/publishing/
+          # 2. Delete the `password` line below.
+          password: ${{ secrets.PYPI_API_TOKEN }}
+
+  publish-rust:
+    name: Rust → crates.io
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release-crates
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cargo publish
+        working-directory: rust
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: cargo publish
+
+  publish-npm-js:
+    name: JS → npm
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release-npm
+    permissions:
+      id-token: write   # for npm provenance attestation (SLSA build proof)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish
+        working-directory: js
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+
+  publish-npm-ts:
+    name: TS → npm
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: release-npm
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install workspace deps (@types/node)
+        run: npm install
+
+      - name: Build TS to dist/
+        working-directory: ts
+        run: npm run build
+
+      - name: Publish
+        working-directory: ts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+
+  tag-go:
+    name: Go → push go/vX.Y.Z tag
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # to push the new tag
+    env:
+      TAG: ${{ github.ref_name }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push go/<tag> if missing
+        run: |
+          GO_TAG="go/${TAG}"
+          if git ls-remote --tags origin "refs/tags/${GO_TAG}" | grep -q .; then
+            echo "${GO_TAG} already on remote — skipping."
+          else
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git tag -a "$GO_TAG" -m "Go module ${TAG}"
+            git push origin "$GO_TAG"
+          fi
+
+      - name: Warm proxy.golang.org cache
+        run: |
+          curl -fsSL "https://proxy.golang.org/github.com/${REPO}/go/@v/${TAG}.info" \
+            || echo "Proxy warming failed (non-fatal — pkg.go.dev will index on first user request)"
+
+  github-release:
+    name: GitHub Release (draft)
+    needs:
+      - publish-ruby
+      - publish-python
+      - publish-rust
+      - publish-npm-js
+      - publish-npm-ts
+      - tag-go
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract changelog section for this version
+        run: |
+          VERSION="${TAG#v}"
+          awk -v v="\\[$VERSION\\]" '
+            $0 ~ "^## " v { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Release $TAG." > release-notes.md
+          fi
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.TAG }}
+          body_path: release-notes.md
+          # Drafted, not auto-published — review and click "Publish release" by hand.
+          draft: true
