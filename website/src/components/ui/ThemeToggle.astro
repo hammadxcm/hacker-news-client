@@ -1,75 +1,218 @@
 ---
+import { themes } from '../../data/themes';
+
 interface Props {
   label?: string;
+  randomLabel?: string;
 }
-const { label = 'Toggle theme' } = Astro.props;
+const { label = 'Choose theme', randomLabel = 'Random' } = Astro.props;
 ---
 
-<button type="button" class="theme-toggle" data-theme-toggle aria-label={label}>
-  <svg
-    class="theme-toggle-sun"
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
+<div class="theme-switcher" data-theme-switcher>
+  <button
+    type="button"
+    class="theme-trigger"
+    data-theme-trigger
+    aria-haspopup="listbox"
+    aria-expanded="false"
+    aria-label={label}
+    title={label}
   >
-    <circle cx="12" cy="12" r="4"></circle>
-    <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"
-    ></path>
-  </svg>
-  <svg
-    class="theme-toggle-moon"
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-  </svg>
-</button>
+    <span class="theme-trigger-dot" aria-hidden="true"></span>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9"></circle>
+      <path d="M12 3a9 9 0 0 1 0 18 5 5 0 0 0 0-10 4 4 0 0 1 0-8z"></path>
+    </svg>
+  </button>
+
+  <div class="theme-panel" data-theme-panel role="listbox" aria-label={label} hidden>
+    <p class="theme-panel-title">{label}</p>
+    <div class="theme-grid">
+      {
+        themes.map((theme) => (
+          <button
+            type="button"
+            class="theme-option"
+            data-theme-option={theme.id}
+            role="option"
+            aria-selected="false"
+            title={theme.label}
+          >
+            <span class="theme-swatch" style={`background: ${theme.swatch}`} aria-hidden="true" />
+            <span class="theme-label">{theme.label}</span>
+          </button>
+        ))
+      }
+    </div>
+    <button type="button" class="theme-random" data-theme-random>
+      <span aria-hidden="true">🎲</span>
+      <span>{randomLabel}</span>
+    </button>
+  </div>
+</div>
 
 <style>
-  .theme-toggle {
-    width: 38px;
-    height: 38px;
+  .theme-switcher {
+    position: relative;
+    display: inline-flex;
+  }
+
+  .theme-trigger {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
+    gap: 6px;
+    padding: 0 10px;
+    height: 38px;
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     background: var(--color-bg-surface);
     color: var(--color-text-secondary);
-    transition: all 200ms var(--ease-out-expo);
+    transition:
+      color 200ms var(--ease-out-expo),
+      border-color 200ms var(--ease-out-expo),
+      background-color 200ms var(--ease-out-expo);
   }
 
-  .theme-toggle:hover {
+  .theme-trigger:hover {
     color: var(--color-text-primary);
     border-color: var(--color-border-strong);
   }
 
-  .theme-toggle-sun {
-    display: none;
+  .theme-trigger[aria-expanded='true'] {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px var(--color-brand-glow);
   }
 
-  .theme-toggle-moon {
-    display: block;
+  .theme-trigger-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-brand);
+    box-shadow: 0 0 0 2px var(--color-bg-surface);
   }
 
-  :global([data-theme='light']) .theme-toggle-sun {
-    display: block;
+  .theme-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    inset-inline-end: 0;
+    min-width: 280px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+    z-index: 70;
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+    pointer-events: none;
+    transition:
+      opacity 200ms var(--ease-out-expo),
+      transform 200ms var(--ease-out-expo);
   }
 
-  :global([data-theme='light']) .theme-toggle-moon {
-    display: none;
+  .theme-panel.is-open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .theme-panel-title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+    padding-inline: 4px;
+  }
+
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .theme-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: start;
+    transition: all 150ms var(--ease-out-expo);
+    border: 1px solid transparent;
+  }
+
+  .theme-option:hover {
+    color: var(--color-text-primary);
+    background: color-mix(in srgb, var(--color-brand) 8%, transparent);
+  }
+
+  .theme-option.is-active {
+    color: var(--color-brand);
+    border-color: var(--color-brand);
+    background: color-mix(in srgb, var(--color-brand) 6%, transparent);
+  }
+
+  .theme-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px var(--color-bg-elevated);
+    flex-shrink: 0;
+  }
+
+  .theme-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .theme-random {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    margin-top: 4px;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    transition: color 150ms var(--ease-out-expo);
+  }
+
+  .theme-random:hover {
+    color: var(--color-brand);
+  }
+
+  @media (max-width: 520px) {
+    .theme-panel {
+      min-width: min(92vw, 320px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-panel,
+    .theme-trigger,
+    .theme-option,
+    .theme-random {
+      transition: none;
+    }
   }
 </style>

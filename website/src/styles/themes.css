@@ -1,34 +1,357 @@
+/* ═══════════════════════════════════════════
+   hacker-news-client — 15 Theme System
+   Default (HN Dark) lives in global.css :root.
+   Each theme overrides the same custom properties.
+   ═══════════════════════════════════════════ */
+
+/* ── LIGHT ── */
 [data-theme="light"] {
+  --color-brand: #d4004a;
+  --color-brand-dim: #b00040;
+  --color-brand-glow: rgba(212, 0, 74, 0.18);
+  --color-accent: #0090c0;
+  --color-accent-dim: #007a9c;
   --color-bg-base: #fafafa;
   --color-bg-surface: #ffffff;
   --color-bg-elevated: #f4f4f5;
   --color-bg-overlay: rgba(250, 250, 250, 0.78);
   --color-border: #e4e4e7;
   --color-border-strong: #d4d4d8;
-
   --color-text-primary: #0b0d12;
   --color-text-secondary: #52525b;
   --color-text-muted: #71717a;
-
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
-
   --glass-bg: rgba(255, 255, 255, 0.72);
-
   color-scheme: light;
 }
 
+/* ── DRACULA ── */
+[data-theme="dracula"] {
+  --color-brand: #ff79c6;
+  --color-brand-dim: #d957a5;
+  --color-brand-glow: rgba(255, 121, 198, 0.18);
+  --color-accent: #8be9fd;
+  --color-accent-dim: #5cd1e8;
+  --color-bg-base: #282a36;
+  --color-bg-surface: #343746;
+  --color-bg-elevated: #44475a;
+  --color-bg-overlay: rgba(40, 42, 54, 0.78);
+  --color-border: #44475a;
+  --color-border-strong: #6272a4;
+  --color-text-primary: #f8f8f2;
+  --color-text-secondary: #6272a4;
+  --color-text-muted: #4e5577;
+  --glass-bg: rgba(40, 42, 54, 0.6);
+  color-scheme: dark;
+}
+
+/* ── NORD ── */
+[data-theme="nord"] {
+  --color-brand: #bf616a;
+  --color-brand-dim: #9e4d55;
+  --color-brand-glow: rgba(191, 97, 106, 0.18);
+  --color-accent: #88c0d0;
+  --color-accent-dim: #6a9eae;
+  --color-bg-base: #2e3440;
+  --color-bg-surface: #3b4252;
+  --color-bg-elevated: #434c5e;
+  --color-bg-overlay: rgba(46, 52, 64, 0.78);
+  --color-border: #434c5e;
+  --color-border-strong: #4c566a;
+  --color-text-primary: #eceff4;
+  --color-text-secondary: #7b88a1;
+  --color-text-muted: #5e6779;
+  --glass-bg: rgba(46, 52, 64, 0.6);
+  color-scheme: dark;
+}
+
+/* ── CATPPUCCIN ── */
+[data-theme="catppuccin"] {
+  --color-brand: #f38ba8;
+  --color-brand-dim: #d76d8a;
+  --color-brand-glow: rgba(243, 139, 168, 0.18);
+  --color-accent: #89b4fa;
+  --color-accent-dim: #6a96e0;
+  --color-bg-base: #1e1e2e;
+  --color-bg-surface: #2a2a3c;
+  --color-bg-elevated: #313244;
+  --color-bg-overlay: rgba(30, 30, 46, 0.78);
+  --color-border: #313244;
+  --color-border-strong: #45475a;
+  --color-text-primary: #cdd6f4;
+  --color-text-secondary: #888da5;
+  --color-text-muted: #6c7086;
+  --glass-bg: rgba(30, 30, 46, 0.6);
+  color-scheme: dark;
+}
+
+/* ── SYNTHWAVE ── */
+[data-theme="synthwave"] {
+  --color-brand: #ff2e97;
+  --color-brand-dim: #d12278;
+  --color-brand-glow: rgba(255, 46, 151, 0.22);
+  --color-accent: #00f0ff;
+  --color-accent-dim: #00c4d1;
+  --color-bg-base: #1a1028;
+  --color-bg-surface: #231538;
+  --color-bg-elevated: #2a1a40;
+  --color-bg-overlay: rgba(26, 16, 40, 0.78);
+  --color-border: #2a1a40;
+  --color-border-strong: #3e2664;
+  --color-text-primary: #f0e6ff;
+  --color-text-secondary: #9b7ec8;
+  --color-text-muted: #745a99;
+  --glass-bg: rgba(26, 16, 40, 0.6);
+  color-scheme: dark;
+}
+
+/* ── MATRIX ── */
+[data-theme="matrix"] {
+  --color-brand: #00ff41;
+  --color-brand-dim: #00cc34;
+  --color-brand-glow: rgba(0, 255, 65, 0.22);
+  --color-accent: #7cfc00;
+  --color-accent-dim: #5fc500;
+  --color-bg-base: #0a0a0a;
+  --color-bg-surface: #0d140d;
+  --color-bg-elevated: #0a140a;
+  --color-bg-overlay: rgba(10, 10, 10, 0.82);
+  --color-border: #143614;
+  --color-border-strong: #1f5520;
+  --color-text-primary: #00ff41;
+  --color-text-secondary: #00c818;
+  --color-text-muted: #008010;
+  --glass-bg: rgba(10, 10, 10, 0.6);
+  color-scheme: dark;
+}
+
+/* ── BLOOD MOON ── */
+[data-theme="bloodmoon"] {
+  --color-brand: #ff0040;
+  --color-brand-dim: #c4002f;
+  --color-brand-glow: rgba(255, 0, 64, 0.22);
+  --color-accent: #ff8fa3;
+  --color-accent-dim: #d77688;
+  --color-bg-base: #0d0208;
+  --color-bg-surface: #150610;
+  --color-bg-elevated: #1a0410;
+  --color-bg-overlay: rgba(13, 2, 8, 0.82);
+  --color-border: #2a0a1a;
+  --color-border-strong: #4a0e2a;
+  --color-text-primary: #f0e6e8;
+  --color-text-secondary: #c06b84;
+  --color-text-muted: #8a4a5c;
+  --glass-bg: rgba(13, 2, 8, 0.6);
+  color-scheme: dark;
+}
+
+/* ── MIDNIGHT ── */
+[data-theme="midnight"] {
+  --color-brand: #e8457c;
+  --color-brand-dim: #c0376a;
+  --color-brand-glow: rgba(232, 69, 124, 0.18);
+  --color-accent: #7dd3fc;
+  --color-accent-dim: #5cb4dd;
+  --color-bg-base: #0f0f1a;
+  --color-bg-surface: #161624;
+  --color-bg-elevated: #18182a;
+  --color-bg-overlay: rgba(15, 15, 26, 0.78);
+  --color-border: #1f1f3a;
+  --color-border-strong: #2d2d52;
+  --color-text-primary: #e8e6f0;
+  --color-text-secondary: #9290a8;
+  --color-text-muted: #6b6982;
+  --glass-bg: rgba(15, 15, 26, 0.6);
+  color-scheme: dark;
+}
+
+/* ── GRUVBOX ── */
+[data-theme="gruvbox"] {
+  --color-brand: #fabd2f;
+  --color-brand-dim: #d99e1d;
+  --color-brand-glow: rgba(250, 189, 47, 0.18);
+  --color-accent: #b8bb26;
+  --color-accent-dim: #98a019;
+  --color-bg-base: #282828;
+  --color-bg-surface: #32302f;
+  --color-bg-elevated: #3c3836;
+  --color-bg-overlay: rgba(40, 40, 40, 0.82);
+  --color-border: #3c3836;
+  --color-border-strong: #504945;
+  --color-text-primary: #ebdbb2;
+  --color-text-secondary: #a89984;
+  --color-text-muted: #7c6f64;
+  --glass-bg: rgba(40, 40, 40, 0.6);
+  color-scheme: dark;
+}
+
+/* ── CYBERPUNK ── */
+[data-theme="cyberpunk"] {
+  --color-brand: #ff2e97;
+  --color-brand-dim: #d12278;
+  --color-brand-glow: rgba(255, 46, 151, 0.22);
+  --color-accent: #ffd700;
+  --color-accent-dim: #d6b500;
+  --color-bg-base: #0a0a12;
+  --color-bg-surface: #101018;
+  --color-bg-elevated: #12121e;
+  --color-bg-overlay: rgba(10, 10, 18, 0.82);
+  --color-border: #1d1d2e;
+  --color-border-strong: #2c2c44;
+  --color-text-primary: #e8e6f0;
+  --color-text-secondary: #8888aa;
+  --color-text-muted: #66667a;
+  --glass-bg: rgba(10, 10, 18, 0.6);
+  color-scheme: dark;
+}
+
+/* ── NEBULA ── */
+[data-theme="nebula"] {
+  --color-brand: #e040fb;
+  --color-brand-dim: #b835d1;
+  --color-brand-glow: rgba(224, 64, 251, 0.22);
+  --color-accent: #b388ff;
+  --color-accent-dim: #8e6cd0;
+  --color-bg-base: #0b0014;
+  --color-bg-surface: #110820;
+  --color-bg-elevated: #160828;
+  --color-bg-overlay: rgba(11, 0, 20, 0.82);
+  --color-border: #1d0d2c;
+  --color-border-strong: #2d1645;
+  --color-text-primary: #f0e6ff;
+  --color-text-secondary: #9b7ec8;
+  --color-text-muted: #745a99;
+  --glass-bg: rgba(11, 0, 20, 0.6);
+  color-scheme: dark;
+}
+
+/* ── SOLARIZED ── */
+[data-theme="solarized"] {
+  --color-brand: #dc322f;
+  --color-brand-dim: #b22a26;
+  --color-brand-glow: rgba(220, 50, 47, 0.18);
+  --color-accent: #268bd2;
+  --color-accent-dim: #1f73af;
+  --color-bg-base: #002b36;
+  --color-bg-surface: #04323e;
+  --color-bg-elevated: #073642;
+  --color-bg-overlay: rgba(0, 43, 54, 0.82);
+  --color-border: #0d4654;
+  --color-border-strong: #1a566a;
+  --color-text-primary: #fdf6e3;
+  --color-text-secondary: #839496;
+  --color-text-muted: #5c6e72;
+  --glass-bg: rgba(0, 43, 54, 0.6);
+  color-scheme: dark;
+}
+
+/* ── ROSE PINE ── */
+[data-theme="rosepine"] {
+  --color-brand: #ea9a97;
+  --color-brand-dim: #c47b78;
+  --color-brand-glow: rgba(234, 154, 151, 0.18);
+  --color-accent: #9ccfd8;
+  --color-accent-dim: #7aabb4;
+  --color-bg-base: #191724;
+  --color-bg-surface: #1f1d2e;
+  --color-bg-elevated: #262335;
+  --color-bg-overlay: rgba(25, 23, 36, 0.78);
+  --color-border: #2a2740;
+  --color-border-strong: #3e3a5a;
+  --color-text-primary: #e0def4;
+  --color-text-secondary: #908caa;
+  --color-text-muted: #6e6a86;
+  --glass-bg: rgba(25, 23, 36, 0.6);
+  color-scheme: dark;
+}
+
+/* ── MONOKAI ── */
+[data-theme="monokai"] {
+  --color-brand: #a6e22e;
+  --color-brand-dim: #7fb422;
+  --color-brand-glow: rgba(166, 226, 46, 0.18);
+  --color-accent: #f92672;
+  --color-accent-dim: #c91d5b;
+  --color-bg-base: #272822;
+  --color-bg-surface: #302f28;
+  --color-bg-elevated: #37362c;
+  --color-bg-overlay: rgba(39, 40, 34, 0.82);
+  --color-border: #3a3a30;
+  --color-border-strong: #4a4a3e;
+  --color-text-primary: #f8f8f2;
+  --color-text-secondary: #90908a;
+  --color-text-muted: #6a6a64;
+  --glass-bg: rgba(39, 40, 34, 0.6);
+  color-scheme: dark;
+}
+
+/* ═══════════════════════════════════════════
+   Smooth theme transitions on every change
+   ═══════════════════════════════════════════ */
+
 html {
-  transition: background-color 300ms var(--ease-out-expo);
+  transition: background-color 320ms var(--ease-out-expo);
 }
 
 body,
 .btn,
 .glass,
-.card {
+.feature,
+.stat,
+.compare-card,
+.api-method,
+.install-tab,
+.install-indicator,
+.install-card,
+.terminal,
+.lang-select,
+.theme-switcher__panel,
+.theme-option {
   transition:
-    background-color 300ms var(--ease-out-expo),
-    border-color 300ms var(--ease-out-expo),
-    color 300ms var(--ease-out-expo);
+    background-color 320ms var(--ease-out-expo),
+    border-color 320ms var(--ease-out-expo),
+    color 320ms var(--ease-out-expo),
+    box-shadow 320ms var(--ease-out-expo);
+}
+
+/* ═══════════════════════════════════════════
+   Per-theme accents on the title
+   ═══════════════════════════════════════════ */
+
+[data-theme="matrix"] .section-title,
+[data-theme="matrix"] .hero-title-line--accent {
+  filter: drop-shadow(0 0 12px rgba(0, 255, 65, 0.4));
+}
+
+[data-theme="cyberpunk"] .section-title {
+  text-shadow: 0 0 14px rgba(255, 215, 0, 0.28);
+}
+
+[data-theme="bloodmoon"] .section-title {
+  text-shadow: 0 0 14px rgba(255, 0, 64, 0.25);
+}
+
+[data-theme="synthwave"] .section-title,
+[data-theme="synthwave"] .hero-title-line--accent {
+  text-shadow: 0 0 14px rgba(255, 46, 151, 0.3);
+}
+
+[data-theme="light"] .hero-title-line--accent,
+[data-theme="light"] .stat-value {
+  background: linear-gradient(
+    135deg,
+    var(--color-brand) 0%,
+    var(--color-brand-dim) 50%,
+    var(--color-accent) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+[data-theme="light"] ::selection {
+  background: rgba(212, 0, 74, 0.22);
+  color: #1a1a2e;
 }

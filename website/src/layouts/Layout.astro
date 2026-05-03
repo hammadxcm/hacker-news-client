@@ -60,16 +60,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 
     <script is:inline>
       (function () {
+        var valid = [
+          'dark', 'light', 'dracula', 'nord', 'catppuccin', 'synthwave',
+          'matrix', 'bloodmoon', 'midnight', 'gruvbox', 'cyberpunk',
+          'nebula', 'solarized', 'rosepine', 'monokai',
+        ];
         try {
           var stored = localStorage.getItem('hn-client-theme');
           var theme =
-            stored === 'light' || stored === 'dark'
+            stored && valid.indexOf(stored) !== -1
               ? stored
               : matchMedia('(prefers-color-scheme: light)').matches
                 ? 'light'
                 : 'dark';
           document.documentElement.setAttribute('data-theme', theme);
-          document.documentElement.style.colorScheme = theme;
         } catch (e) {
           document.documentElement.setAttribute('data-theme', 'dark');
         }
@@ -85,16 +89,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site).toString();
       import { setupCopyButtons } from '../scripts/copy-button';
       import { setupInstallTabs } from '../scripts/install-tabs';
       import { setupRevealObserver } from '../scripts/observer';
-      import { setupThemeToggle } from '../scripts/theme-switcher';
+      import { setupThemeSwitcher } from '../scripts/theme-switcher';
       import { setupTypingTerminal } from '../scripts/typing';
 
       setupCopyButtons();
       setupInstallTabs();
       setupRevealObserver();
 
-      const themeToggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
-      if (themeToggle) {
-        setupThemeToggle(themeToggle);
+      const themeSwitcher = document.querySelector<HTMLElement>('[data-theme-switcher]');
+      if (themeSwitcher) {
+        setupThemeSwitcher(themeSwitcher);
       }
 
       const heroCanvas = document.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
