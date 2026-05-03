@@ -4,7 +4,9 @@ How to cut a new version of the cross-language Hacker News client suite.
 
 The six libraries are versioned in **lockstep** — every release ships the same `vX.Y.Z` to all six registries. There is no per-language drift.
 
-> Audience: anyone with publish credentials for the six registries. The recipe below assumes you've already done the one-time auth setup at the bottom.
+> **Default path:** automated via `.github/workflows/publish.yml` — push a `vX.Y.Z` tag and CI publishes everything in parallel. See [Automated release (recommended)](#automated-release-recommended).
+>
+> **Fallback path:** the manual per-language commands below also work if CI is broken or you need to re-publish a single language out of band. See [Manual publish — per language](#manual-publish--per-language).
 
 ---
 
@@ -25,7 +27,93 @@ The naming asymmetries are intentional. PyPI's similarity rule blocks `hacker-ne
 
 ---
 
-## Pre-release checklist
+## Automated release (recommended)
+
+Once the [one-time CI setup](#one-time-cicd-setup) is done, every release is:
+
+```bash
+# 1. Clean main.
+git checkout main && git pull
+
+# 2. Bump the version everywhere.
+scripts/bump-version.sh 0.2.0
+
+# 3. Cross-language verification.
+bash scripts/verify.sh
+npm run lint
+
+# 4. Update CHANGELOG.md — move [Unreleased] entries under
+#    a new ## [0.2.0] — YYYY-MM-DD heading, add new
+#    [Unreleased] above it, update the link refs at the bottom.
+
+# 5. Commit, tag, push.
+git add VERSION js/package.json ts/package.json \
+        python/pyproject.toml ruby/lib/hacker/news/version.rb \
+        rust/Cargo.toml CHANGELOG.md
+git commit -m "release: v0.2.0"
+git tag -a v0.2.0 -m "v0.2.0"
+git push origin main v0.2.0
+```
+
+The `v0.2.0` tag push triggers `.github/workflows/publish.yml`, which:
+
+1. Verifies the tag matches `VERSION` and that `CHANGELOG.md` has a `[0.2.0]` section.
+2. Builds and publishes in **parallel**: RubyGems, PyPI, crates.io, npm (JS), npm (TS).
+3. Auto-creates `go/v0.2.0` and warms `proxy.golang.org`.
+4. Drafts a GitHub Release page from the `[0.2.0]` CHANGELOG section — review and click **Publish release** by hand.
+
+If a single language fails, the others still succeed. Re-run that one job from the Actions UI, or use the [manual fallback below](#manual-publish--per-language).
+
+---
+
+## One-time CI/CD setup
+
+Do these steps once before the first automated release. Skip if already done.
+
+### 1. Generate scoped publish tokens at each registry
+
+Use **the narrowest scope possible** and an expiration:
+
+| Registry | Where | Scope to choose |
+|---|---|---|
+| RubyGems | https://rubygems.org/profile/api_keys | name `gha-publish`, scope **Push rubygem** only, narrow to gem `hacker-news-client` |
+| PyPI | https://pypi.org/manage/account/token/ | name `gha-publish`, scope **Project: hn-api-client** |
+| crates.io | https://crates.io/settings/tokens | name `gha-publish`, scope **`publish-update`**, crate **`hacker-news-client`** only |
+| npm | https://www.npmjs.com/settings/hammadxcm/tokens | **Granular Access Token**, packages **`@hammadxcm/*`**, **read+write**, expiration 90 days |
+
+### 2. Create four GitHub environments with scoped secrets
+
+At https://github.com/hammadxcm/hacker-news-client/settings/environments → **New environment** (×4):
+
+| Environment | Secret name | Value |
+|---|---|---|
+| `release-rubygems` | `RUBYGEMS_API_KEY` | RubyGems token |
+| `release-pypi` | `PYPI_API_TOKEN` | PyPI token |
+| `release-crates` | `CARGO_REGISTRY_TOKEN` | crates.io token |
+| `release-npm` | `NPM_TOKEN` | npm token |
+
+Per-environment scoping means a leaked npm token cannot reach the PyPI one.
+
+### 3. (Optional but recommended) Manual approval gate
+
+Same environments page → for each, check **"Required reviewers"** and add yourself. Now any release pauses for a one-click approval before publishing — a final airbag in case a tag goes out by mistake.
+
+### 4. (Future) Migrate to OIDC Trusted Publishing
+
+The workflow already requests `id-token: write` so OIDC migration is a no-code change:
+
+- **PyPI** — set up a Trusted Publisher at https://pypi.org/manage/project/hn-api-client/settings/publishing/ matching repo `hammadxcm/hacker-news-client`, workflow `publish.yml`, environment `release-pypi`. Then delete the `password:` line from the workflow. **No PyPI token in GitHub secrets ever again.**
+- **npm** — Trusted Publishing is in beta as of 2026-05; once GA you can drop `NPM_TOKEN` similarly. The `--provenance` flag is already on, writing SLSA attestations downstream `npm install`ers can verify with `npm audit signatures`.
+
+That eliminates two of the four secrets.
+
+---
+
+## Manual publish — per language
+
+Use this only if CI is broken or you need to re-publish a single language out of band. The automated workflow above is the default path.
+
+### Pre-release checklist (manual mode)
 
 Run from the repo root.
 
@@ -64,11 +152,11 @@ git push origin main v0.2.0 go/v0.2.0
 
 ---
 
-## Publish — per language
+### Per-language commands
 
-Run **after** the pre-release checklist has tagged. Each block is independent; they can run in any order or in parallel. None require approving the others to land.
+Run **after** the manual pre-release checklist has tagged. Each block is independent; they can run in any order or in parallel.
 
-### Ruby — `cd ruby`
+#### Ruby — `cd ruby`
 
 ```bash
 gem build hacker-news-client.gemspec
@@ -77,7 +165,7 @@ gem push hacker-news-client-0.2.0.gem
 
 The gemspec sets `rubygems_mfa_required = true`, so `gem push` prompts for an MFA OTP from your authenticator app. Verify at https://rubygems.org/gems/hacker-news-client.
 
-### Python — `cd python`
+#### Python — `cd python`
 
 ```bash
 rm -rf dist
@@ -87,7 +175,7 @@ python3 -m twine upload dist/hn_api_client-0.2.0*  # prompts for token if no ~/.
 
 If `twine` isn't installed: `pip install build twine`. Verify at https://pypi.org/project/hn-api-client/.
 
-### Rust — `cd rust`
+#### Rust — `cd rust`
 
 ```bash
 cargo publish
@@ -95,7 +183,7 @@ cargo publish
 
 `cargo publish` does its own pre-flight build, package, and verify, then uploads. The token comes from `~/.cargo/credentials.toml` (set up via `cargo login`). Verify at https://crates.io/crates/hacker-news-client and https://docs.rs/hacker-news-client.
 
-### JS — `cd js`
+#### JS — `cd js`
 
 ```bash
 npm publish      # publishConfig.access = "public" is set in package.json
@@ -103,7 +191,7 @@ npm publish      # publishConfig.access = "public" is set in package.json
 
 The package is scoped (`@hammadxcm/...`), so the `--access public` flag is implicit through `publishConfig` in `package.json`. Verify at https://www.npmjs.com/package/@hammadxcm/hn-api-client-js.
 
-### TS — `cd ts`
+#### TS — `cd ts`
 
 ```bash
 npm run build    # tsc → dist/ (rewrites .ts imports to .js)
@@ -112,7 +200,7 @@ npm publish
 
 The `dist/` build output is `.gitignore`d but produced fresh on each publish. The build requires `@types/node` at the monorepo root (already a devDependency); if you ever see `Cannot find type definition file for 'node'`, run `npm install` at the root first.
 
-### Go — `cd go`
+#### Go — `cd go`
 
 Nothing to publish actively. Once `go/v0.2.0` is tagged on `main` (step 7 above), `proxy.golang.org` will serve the new version on first request:
 
@@ -180,16 +268,26 @@ Both must point at the same commit. They are pushed together in step 7 of the ch
 
 ## Token management
 
-Each registry needs a different credential. Best practice is per-registry tokens with **the narrowest scope possible** and an expiration date.
+For the **automated release path**, all credentials live as GitHub Secrets inside per-registry environments — see [One-time CI/CD setup](#one-time-cicd-setup) above. Developer machines do not need any registry credentials at all.
 
-| Registry | Where | Recommended scope |
+For the **manual fallback path**, each registry stores its credential locally:
+
+| Registry | Where (local CLI) | Recommended scope |
 |---|---|---|
-| RubyGems | `~/.local/share/gem/credentials` (set by `gem signin`) | The `rubygems_mfa_required` metadata flag means MFA OTP is required at every push — no scoped tokens needed. |
-| PyPI | `~/.pypirc` or `TWINE_PASSWORD` env var | Project-scoped token for `hn-api-client` (created at https://pypi.org/manage/account/token/ after first publish). |
-| crates.io | `~/.cargo/credentials.toml` (set by `cargo login`) | Crate-scoped token for `hacker-news-client` with `publish-update` only (created at https://crates.io/settings/tokens). |
-| npm | `~/.npmrc` (set by `npm login`) | Granular token, scoped to `@hammadxcm/*`, **read+write** on existing packages, with expiration (created at https://www.npmjs.com/settings/hammadxcm/tokens). |
+| RubyGems | `~/.local/share/gem/credentials` (set by `gem signin`) | The `rubygems_mfa_required` metadata flag means MFA OTP is required at every push for human accounts. API keys with the `mfa` + `index_rubygems` scopes bypass the prompt — that's what CI uses. |
+| PyPI | `~/.pypirc` or `TWINE_PASSWORD` env var | Project-scoped token for `hn-api-client` (https://pypi.org/manage/account/token/). |
+| crates.io | `~/.cargo/credentials.toml` (set by `cargo login`) | Crate-scoped token for `hacker-news-client` with `publish-update` only (https://crates.io/settings/tokens). |
+| npm | `~/.npmrc` (set by `npm login`) | Granular token, scoped to `@hammadxcm/*`, **read+write**, with expiration (https://www.npmjs.com/settings/hammadxcm/tokens). |
 
-Never paste tokens into a chat or commit them. If you do leak one, revoke it immediately at the registry's token page and issue a new one.
+### Treating a leaked token as compromised
+
+**Never paste a token into a chat, a commit, an issue, or a PR description.** If a token reaches any of those places — including this assistant's conversation history — assume it is compromised:
+
+1. **Revoke immediately** at the registry's token page (links above).
+2. **Generate a fresh, narrowly-scoped replacement** with an expiration.
+3. **Update the corresponding GitHub Secret** (Settings → Environments → the right environment → update the secret value). The old workflow runs continue with the old (now-revoked) token; new runs pick up the new one automatically.
+
+Why act fast: with a leaked publish token, an attacker can push a malicious `0.X.Y` version of any package you own. Downstream consumers running `pip install -U`, `bundle update`, `cargo update`, or `npm install` pull the poisoned version automatically. This is the supply-chain attack pattern behind event-stream (2018), ua-parser-js (2021), and many more.
 
 ---
 
