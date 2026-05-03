@@ -1,5 +1,5 @@
 import { HttpError, JsonError, TimeoutError, TransportError } from './errors.ts';
-import type { CommentTreeNode, Item, Updates, User } from './types.ts';
+import type { Comment, CommentTreeNode, Item, Updates, User } from './types.ts';
 
 const DEFAULT_BASE_URL = 'https://hacker-news.firebaseio.com/v0';
 const DEFAULT_TIMEOUT_MS = 10_000;

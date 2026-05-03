@@ -1,7 +1,7 @@
 {
-  "name": "hacker-news-client",
+  "name": "@hammadxcm/hn-api-client-js",
   "version": "0.1.0",
-  "description": "Zero-dependency client for the Hacker News Firebase API.",
+  "description": "Zero-dependency JavaScript client for the Hacker News Firebase API.",
   "type": "module",
   "main": "./src/index.js",
   "exports": {
@@ -18,7 +18,8 @@
   },
   "files": [
     "src/",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "hacker-news",
@@ -27,5 +28,17 @@
     "api",
     "client"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hammadxcm/hacker-news-client.git",
+    "directory": "js"
+  },
+  "bugs": {
+    "url": "https://github.com/hammadxcm/hacker-news-client/issues"
+  },
+  "homepage": "https://github.com/hammadxcm/hacker-news-client/tree/main/js#readme",
+  "publishConfig": {
+    "access": "public"
+  }
 }

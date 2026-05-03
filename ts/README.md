@@ -1,6 +1,6 @@
-# @hacker-news/client-ts (TypeScript)
+# @hammadxcm/hn-api-client-ts (TypeScript)
 
-[![npm version](https://img.shields.io/npm/v/%40hacker-news%2Fclient-ts.svg?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/@hacker-news/client-ts)
+[![npm version](https://img.shields.io/npm/v/%40hammadxcm%2Fhn-api-client-ts.svg?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/@hammadxcm/hn-api-client-ts)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](../LICENSE)
 [![Node](https://img.shields.io/badge/node-%E2%89%A522.6-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?style=flat-square&logo=typescript&logoColor=white)](./tsconfig.json)
@@ -11,13 +11,13 @@ Strict-mode TypeScript client for the [Hacker News Firebase API](https://github.
 ## Install
 
 ```bash
-npm install @hacker-news/client-ts
+npm install @hammadxcm/hn-api-client-ts
 ```
 
 ## Usage
 
 ```ts
-import { HackerNewsClient, type Item, type Story } from '@hacker-news/client-ts';
+import { HackerNewsClient, type Item, type Story } from '@hammadxcm/hn-api-client-ts';
 
 const client = new HackerNewsClient();
 
@@ -37,7 +37,7 @@ const user = await client.user('pg');
 The `Item` union is tagged by a literal `type` field — TypeScript narrows on it:
 
 ```ts
-import type { Item, Story, Comment, Job, Poll, PollOpt } from '@hacker-news/client-ts';
+import type { Item, Story, Comment, Job, Poll, PollOpt } from '@hammadxcm/hn-api-client-ts';
 
 function describe(item: Item): string {
   switch (item.type) {
@@ -76,7 +76,7 @@ import {
   HttpError,
   JsonError,
   TransportError,
-} from '@hacker-news/client-ts';
+} from '@hammadxcm/hn-api-client-ts';
 
 try {
   await client.item(1);

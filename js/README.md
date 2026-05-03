@@ -1,6 +1,6 @@
-# hacker-news-client (JavaScript)
+# @hammadxcm/hn-api-client-js (JavaScript)
 
-[![npm version](https://img.shields.io/npm/v/hacker-news-client.svg?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/hacker-news-client)
+[![npm version](https://img.shields.io/npm/v/%40hammadxcm%2Fhn-api-client-js.svg?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/package/@hammadxcm/hn-api-client-js)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](../LICENSE)
 [![Node](https://img.shields.io/badge/node-%E2%89%A520-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen.svg?style=flat-square)](#tests)
@@ -10,13 +10,13 @@ Zero-dependency JavaScript client for the [Hacker News Firebase API](https://git
 ## Install
 
 ```bash
-npm install hacker-news-client
+npm install @hammadxcm/hn-api-client-js
 ```
 
 ## Usage
 
 ```js
-import { HackerNewsClient } from 'hacker-news-client';
+import { HackerNewsClient } from '@hammadxcm/hn-api-client-js';
 
 const client = new HackerNewsClient();
 
@@ -61,7 +61,7 @@ import {
   HttpError,
   JsonError,
   TransportError,
-} from 'hacker-news-client';
+} from '@hammadxcm/hn-api-client-js';
 
 try {
   await client.item(1);

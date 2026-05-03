@@ -1,7 +1,7 @@
 /**
- * @file Public entry point for the `@hacker-news/client-ts` package.
+ * @file Public entry point for the `@hammadxcm/hn-api-client-ts` package.
  * @example
- * import { HackerNewsClient } from '@hacker-news/client-ts';
+ * import { HackerNewsClient } from '@hammadxcm/hn-api-client-ts';
  * const client = new HackerNewsClient();
  * const item = await client.item(1);
  */

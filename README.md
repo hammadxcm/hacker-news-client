@@ -93,11 +93,11 @@ A production-quality client suite for the official [Hacker News Firebase API](ht
 <summary><b>JavaScript (Node 20+)</b></summary>
 
 ```bash
-npm install hacker-news-client
+npm install @hammadxcm/hn-api-client-js
 ```
 
 ```js
-import { HackerNewsClient } from 'hacker-news-client';
+import { HackerNewsClient } from '@hammadxcm/hn-api-client-js';
 
 const client = new HackerNewsClient();
 const story = await client.item(1);
@@ -115,11 +115,11 @@ More: [`js/README.md`](./js/README.md)
 <summary><b>TypeScript (Node 22.6+, strict)</b></summary>
 
 ```bash
-npm install @hacker-news/client-ts
+npm install @hammadxcm/hn-api-client-ts
 ```
 
 ```ts
-import { HackerNewsClient, type Item } from '@hacker-news/client-ts';
+import { HackerNewsClient, type Item } from '@hammadxcm/hn-api-client-ts';
 
 const client = new HackerNewsClient();
 const item = await client.item(1);
