@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "private": true,
-  "description": "Landing site for hacker-news-client — a multi-language SDK for the Hacker News API.",
+  "description": "Landing site for hacker-news-client \u2014 a multi-language SDK for the Hacker News API.",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -36,7 +36,8 @@
     "overrides": {
       "esbuild": "^0.28.1",
       "devalue": "^5.8.1",
-      "fast-uri": "^3.1.2"
+      "fast-uri": "^3.1.2",
+      "js-yaml": "^4.3.0"
     }
   }
 }
