@@ -24,7 +24,7 @@ jobs:
       - run: npm ci
       - name: Run c8
         run: npx c8 --reporter=lcov --reports-dir=coverage/js --include='js/src/**' node --test js/test/*.test.js
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: coverage/js/lcov.info
           flags: js
@@ -42,7 +42,7 @@ jobs:
       - run: npm ci
       - name: Run c8
         run: npx c8 --reporter=lcov --reports-dir=coverage/ts --include='ts/src/**' --exclude='ts/src/**/*.d.ts' node --test --experimental-strip-types --disable-warning=ExperimentalWarning ts/test/*.test.ts
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: coverage/ts/lcov.info
           flags: typescript
@@ -66,7 +66,7 @@ jobs:
         run: |
           python -m coverage run --source=src/hacker_news_client -m unittest tests.test_client tests.test_unit
           python -m coverage xml -o coverage.xml
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: python/coverage.xml
           flags: python
@@ -87,7 +87,7 @@ jobs:
       - name: Run coverage
         working-directory: go
         run: go test -coverprofile=coverage.out ./...
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: go/coverage.out
           flags: go
@@ -114,7 +114,7 @@ jobs:
         env:
           COVERAGE: "1"
         run: bundle exec rake test
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: ruby/coverage/coverage.xml,ruby/coverage/.resultset.json
           flags: ruby
@@ -139,7 +139,7 @@ jobs:
       - name: Generate lcov
         working-directory: rust
         run: cargo llvm-cov --tests --lcov --output-path lcov.info
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v6
         with:
           files: rust/lcov.info
           flags: rust
