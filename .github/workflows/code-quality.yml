@@ -16,7 +16,7 @@ jobs:
     name: actionlint (GitHub workflows)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: reviewdog/action-actionlint@v1
         with:
           fail_level: error
@@ -26,7 +26,7 @@ jobs:
     name: shellcheck (shell scripts)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ludeeus/action-shellcheck@master
         with:
           severity: warning
@@ -37,7 +37,7 @@ jobs:
     name: markdownlint (docs)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: DavidAnson/markdownlint-cli2-action@v16
         with:
           globs: |
@@ -52,5 +52,5 @@ jobs:
     name: editorconfig-checker
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: editorconfig-checker/action-editorconfig-checker@v2

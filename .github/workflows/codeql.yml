@@ -25,7 +25,7 @@ jobs:
         # Rust is not yet supported by CodeQL. We fall back to clippy + cargo audit
         # (not shown here — add a separate workflow when cargo audit is desired).
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
