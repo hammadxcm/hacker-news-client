@@ -64,6 +64,13 @@ test('baseUrl trailing slash stripped', () => {
   assert.equal(c.baseUrl, 'http://x/v0');
 });
 
+test('baseUrl slash stripping is linear and keeps inner slashes', () => {
+  const inner = `http://x/${'/'.repeat(100_000)}v0`;
+  const c = new HackerNewsClient({ baseUrl: `${inner}//` });
+  assert.equal(c.baseUrl, inner);
+  assert.equal(new HackerNewsClient({ baseUrl: '///' }).baseUrl, '');
+});
+
 test('HN_BASE env override', () => {
   const prev = process.env.HN_BASE;
   process.env.HN_BASE = 'http://env.test/v0';
