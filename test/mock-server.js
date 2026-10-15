@@ -41,8 +41,10 @@ async function serveFixture(res, filename) {
       res.end();
       return;
     }
+    // Log details server-side only; never echo error/stack text to clients.
+    console.error(err);
     res.statusCode = 500;
-    res.end(String(err));
+    res.end('internal error');
   }
 }
 

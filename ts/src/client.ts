@@ -7,6 +7,14 @@ const DEFAULT_CONCURRENCY = 10;
 const DEFAULT_USER_AGENT = 'hn-client-ts/0.1.0';
 const DEFAULT_STORIES_LIMIT = 30;
 
+// Strip trailing "/" characters in linear time (a `/\/+$/` regex is
+// quadratic on inputs with many slashes not at the end).
+function stripTrailingSlashes(url: string): string {
+  let end = url.length;
+  while (end > 0 && url.charCodeAt(end - 1) === 47) end--;
+  return url.slice(0, end);
+}
+
 export interface HackerNewsClientOptions {
   readonly baseUrl?: string;
   /** Total request budget in ms (connect + read + decode). */
@@ -45,7 +53,7 @@ export class HackerNewsClient {
       typeof process !== 'undefined' && process.env && process.env.HN_BASE
         ? process.env.HN_BASE
         : undefined;
-    this.baseUrl = (opts.baseUrl ?? envBase ?? DEFAULT_BASE_URL).replace(/\/+$/, '');
+    this.baseUrl = stripTrailingSlashes(opts.baseUrl ?? envBase ?? DEFAULT_BASE_URL);
     // Non-positive timeout/concurrency are replaced with defaults rather
     // than silently producing hangs (timeout ≤ 0) or empty-batch results
     // (concurrency ≤ 0).

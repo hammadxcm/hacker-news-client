@@ -18,7 +18,7 @@ def start_mock_server
   base = line.split(' on ', 2).last.strip
   # readiness probe
   10.times do
-    URI.open("#{base}/maxitem.json", read_timeout: 0.5).read
+    URI("#{base}/maxitem.json").open(read_timeout: 0.5).read
     break
   rescue StandardError
     sleep 0.05

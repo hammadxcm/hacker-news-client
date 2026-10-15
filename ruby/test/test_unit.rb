@@ -70,6 +70,12 @@ class ConstructorTests < Minitest::Test
     assert_equal 'http://x/v0', c.base_url
   end
 
+  def test_strip_trailing_slash_linear_keeps_inner_slashes
+    inner = "http://x/#{'/' * 100_000}v0"
+    assert_equal inner, Hacker::News::Client.new(base_url: "#{inner}//").base_url
+    assert_equal '', Hacker::News::Client.new(base_url: '///').base_url
+  end
+
   def test_hn_base_env
     prev = ENV.fetch('HN_BASE', nil)
     ENV['HN_BASE'] = 'http://env.test/v0'

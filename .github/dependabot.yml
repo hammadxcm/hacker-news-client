@@ -99,3 +99,23 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Hash-pinned CI tool requirements (pip-audit, coverage, ruff, build)
+  - package-ecosystem: "pip"
+    directory: "/.github/requirements"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(ci)"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "python"
+    groups:
+      ci-python-tools:
+        patterns:
+          - "*"

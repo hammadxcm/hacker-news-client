@@ -42,7 +42,7 @@ module Hacker
         # Treat HN_BASE="" as unset (common in .env files).
         env_base = ENV.fetch('HN_BASE', nil)
         env_base = nil if env_base && env_base.empty?
-        @base_url = (base_url || env_base || DEFAULT_BASE_URL).sub(%r{/+$}, '')
+        @base_url = strip_trailing_slashes(base_url || env_base || DEFAULT_BASE_URL)
         # Reject obviously-wrong timeout / concurrency values so users get a
         # default instead of a hang (timeout ≤ 0) or an empty-batch silent
         # failure (concurrency ≤ 0).
@@ -228,6 +228,15 @@ module Hacker
       end
 
       private
+
+      # Strip trailing "/" characters in linear time (a %r{/+$} regex is
+      # quadratic on inputs with many slashes not at the end).
+      def strip_trailing_slashes(url)
+        url = url.to_s
+        stop = url.length
+        stop -= 1 while stop.positive? && url[stop - 1] == '/'
+        url[0, stop]
+      end
 
       # @return [Object] decoded JSON (Hash / Array / Numeric / String / NilClass).
       def get_json(path)
