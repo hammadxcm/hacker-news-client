@@ -19,14 +19,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
           cache: "npm"
       - run: npm ci
       - name: Run c8
         run: npx c8 --reporter=lcov --reports-dir=coverage/js --include='js/src/**' node --test js/test/*.test.js
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: coverage/js/lcov.info
           flags: js
@@ -39,14 +39,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
           cache: "npm"
       - run: npm ci
       - name: Run c8
         run: npx c8 --reporter=lcov --reports-dir=coverage/ts --include='ts/src/**' --exclude='ts/src/**/*.d.ts' node --test --experimental-strip-types --disable-warning=ExperimentalWarning ts/test/*.test.ts
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: coverage/ts/lcov.info
           flags: typescript
@@ -59,10 +59,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
-      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
       - name: Install coverage
@@ -72,7 +72,7 @@ jobs:
         run: |
           python -m coverage run --source=src/hacker_news_client -m unittest tests.test_client tests.test_unit
           python -m coverage xml -o coverage.xml
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: python/coverage.xml
           flags: python
@@ -85,17 +85,17 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
-      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version: "stable"
           cache-dependency-path: go/go.sum
       - name: Run coverage
         working-directory: go
         run: go test -coverprofile=coverage.out ./...
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: go/coverage.out
           flags: go
@@ -108,10 +108,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
-      - uses: ruby/setup-ruby@651ff0d62c5c79bed6d53ec518387aae20e72c1a # v1.329.0
+      - uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
         with:
           ruby-version: "3.3"
           working-directory: ruby
@@ -124,7 +124,7 @@ jobs:
         env:
           COVERAGE: "1"
         run: bundle exec rake test
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: ruby/coverage/coverage.xml,ruby/coverage/.resultset.json
           flags: ruby
@@ -137,13 +137,13 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
       - uses: dtolnay/rust-toolchain@686976e191b89faba57d3206551f0f330d8cb249 # stable
         with:
           components: llvm-tools-preview
-      - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         with:
           workspaces: rust -> target
       - name: Install cargo-llvm-cov
@@ -151,7 +151,7 @@ jobs:
       - name: Generate lcov
         working-directory: rust
         run: cargo llvm-cov --tests --lcov --output-path lcov.info
-      - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+      - uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           files: rust/lcov.info
           flags: rust
